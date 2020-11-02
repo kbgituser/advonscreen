@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20201021064933_ApplicationUser2.cs" />
+    <Compile Remove="Data\Migrations\20201021064933_ApplicationUser2.Designer.cs" />
+    <Compile Remove="Data\Migrations\20201021070702_ApplicationUser3.cs" />
+    <Compile Remove="Data\Migrations\20201021070702_ApplicationUser3.Designer.cs" />
+    <Compile Remove="Data\Migrations\20201022093516_advertisementPoint.cs" />
+    <Compile Remove="Data\Migrations\20201022093516_advertisementPoint.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.8" />
+  </ItemGroup>
+
+</Project>

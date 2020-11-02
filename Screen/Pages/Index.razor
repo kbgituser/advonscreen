@@ -1,0 +1,23 @@
+﻿@page "/"
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+@using Dal.Data
+@using Dal.Models
+@inject Dal.Data.ApplicationDbContext context
+
+@code {
+    private Advertisement advertisement;
+
+    
+
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}

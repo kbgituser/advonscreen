@@ -1,0 +1,18 @@
+﻿
+@{
+    ViewData["Title"] = "EditRole";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>EditRole</h1>
+
+@model Microsoft.AspNetCore.Identity.IdentityRole
+
+<form asp-action="EditRole" method="post">
+    @Html.HiddenFor(model => model.Id)
+    <div class="form-group">
+        @Html.EditorFor(model => model.Name)
+    </div>
+        <br />
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>

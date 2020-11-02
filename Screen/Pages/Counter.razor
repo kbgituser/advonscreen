@@ -1,0 +1,133 @@
+﻿@page "/counter"
+
+
+<h1>Countersdfsdf</h1>
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<p>Current count: @currentCount</p>
+<div>@advText</div>
+@using Microsoft.EntityFrameworkCore;
+@using Dal.Models; 
+
+@inject Dal.Data.ApplicationDbContext context
+
+@code {
+    private Dal.Data.ApplicationDbContext _context;
+    private int currentCount = 0;
+    private string advText;
+
+
+    public Point Point { get; set; }
+    public Advertisement CurrentAdvertisement { get; set; }
+    public Advertisement NextAdvertisement { get; set; }
+    public System.Threading.Timer aTimer;
+    public int AdvertisementDuration { get; set; }
+
+
+
+    protected override void OnInitialized()
+    {
+        //Point = context.Points.FirstOrDefault();
+        //SetNextAdvertisement(null);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Point = context.Points.AsNoTracking().FirstOrDefault();
+            //SetNextAdvertisement(null);
+            StartShow();
+        }
+    }
+
+    private void StartShow()
+    {
+        Point = GetPoint();
+        while (Point.TurnedOn)
+        {
+            SetNextAdvertisement(null);
+            InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+
+            //var t = Task.Factory.StartNew(() =>
+            //{
+            //    Console.WriteLine("Start");
+
+            //    Task.Delay(CurrentAdvertisement.Duration*1000).Wait();
+            //    Console.WriteLine("Done");
+            //});
+            //t.Wait();
+
+            Task.Delay(CurrentAdvertisement.Duration * 1000).Wait();
+            Point = GetPoint();
+        }
+        if (!Point.TurnedOn)
+        {
+            advText = "Показ объявлений по техническим причинам приостановлен";
+            InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+            Task.Delay(30000).Wait();
+        }
+        StartShow();
+    }
+    public Point GetPoint() {
+        return context.Points.AsNoTracking().FirstOrDefault();
+    }
+
+    private void SetNextAdvertisement(object state)
+    {
+        CurrentAdvertisement = GetNext();
+        NextAdvertisement = GetNext();
+
+        advText = (CurrentAdvertisement != null) ? CurrentAdvertisement.Text : "";
+
+    }
+
+
+    public Advertisement GetNext()
+    {
+        Advertisement result;
+        if (CurrentAdvertisement == null)
+        {
+            result = GetFirstAdvertisement();
+            return result;
+        }
+        var advs = context.Advertisements.Where(a => a.Point == Point&& a.CreateDate > CurrentAdvertisement.CreateDate).OrderBy(a => a.CreateDate).AsNoTracking();
+        //advs = advs.Where(elem => elem.CreateDate > CurrentAdvertisement.CreateDate).OrderBy(a=>a.CreateDate).AsNoTracking();
+        if (advs.Any())
+        {
+            result = advs.Where(elem => elem.CreateDate > CurrentAdvertisement.CreateDate).AsNoTracking().FirstOrDefault(); // faster than try-catch
+        }
+        else
+        {
+            result = GetFirstAdvertisement();
+        }
+        return result;    }
+
+    public Advertisement GetFirstAdvertisement()
+    {
+        return context.Advertisements.Where(a => a.Point == Point).OrderBy(a => a.CreateDate).AsNoTracking().FirstOrDefault();
+    }
+
+
+    async private void IncrementCount()
+    {
+        //currentCount++;
+        //context.ChangeTracker.QueryTrackingBehavior = Microsoft.EntityFrameworkCore.QueryTrackingBehavior.NoTracking;
+
+        var advs = context.Advertisements.AsNoTracking().ToList();
+        var advsCount = advs.Count();
+        Dal.Models.Advertisement adv;
+        if (currentCount >= advsCount)
+            currentCount = 0;
+        adv = advs.ElementAt(currentCount);
+        //await context.Entry(adv).ReloadAsync();
+        advText = (adv != null) ? adv.Text : "";
+        currentCount++;
+
+    }
+}
