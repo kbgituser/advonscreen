@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Dal.Data;
 using Dal.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AdvScreen.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class DaysForAdvsController : Controller
     {
         private readonly ApplicationDbContext _context;

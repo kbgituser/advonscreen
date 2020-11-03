@@ -1,23 +1,143 @@
 ﻿@page "/"
-
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
-@using Dal.Data
-@using Dal.Models
-@inject Dal.Data.ApplicationDbContext context
-
-@code {
-    private Advertisement advertisement;
-
+@page "/{PointId:int}"
     
+    @*<h1>Hello, world!</h1>
+        <SurveyPrompt Title="How is Blazor working for you?" />*@
 
-    private int currentCount = 0;
 
-    private void IncrementCount()
-    {
-        currentCount++;
+    @{
+        var pointScreen = "";
+        @if (CurrentAdvertisement != null)
+        {
+            pointScreen = "font-size: " + CurrentAdvertisement.FontSize + "px;";
+        }
     }
-}
+
+    <style>
+
+        #screenEmulator {
+        }
+
+        .PointScreen {
+            font-size: 200px;
+        }
+    </style>
+
+    <div style="@pointScreen">
+        @((MarkupString)advText)
+    </div>
+    @using Dal.Data;
+    @using Dal.Models;
+    @using Microsoft.EntityFrameworkCore;
+    @using Microsoft.AspNetCore.WebUtilities;
+
+    @inject NavigationManager NavManager
+    @inject Dal.Data.ApplicationDbContext context
+
+
+
+    @code {
+        [Parameter]
+        public int PointId { get; set; }
+        private string advText;
+        public Point Point { get; set; }
+        public Advertisement CurrentAdvertisement { get; set; }
+        public Advertisement NextAdvertisement { get; set; }
+        public int AdvertisementDuration { get; set; }
+
+
+        protected override void OnInitialized()
+        {
+            //Point = context.Points.FirstOrDefault();
+            //SetNextAdvertisement(null);
+        }
+
+        protected override void OnAfterRender(bool firstRender)
+        {
+            if (firstRender)
+            {
+                Point = context.Points.AsNoTracking().FirstOrDefault();
+                SetNextAdvertisement(null);
+                StartShow();
+            }
+        }
+
+        private void StartShow()
+        {
+            if (Point == null)
+                Point = GetPoint();
+            while (Point.TurnedOn)
+            {
+                SetNextAdvertisement(null);
+                InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                });
+
+                Task.Delay(CurrentAdvertisement.Duration * 1000).Wait();
+                Point = GetPoint();
+            }
+            if (!Point.TurnedOn)
+            {
+                advText = "Показ объявлений по техническим причинам приостановлен";
+                InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                });
+                Task.Delay(30000).Wait();
+            }
+            StartShow();
+        }
+        public Point GetPoint()
+        {
+            
+            var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+            //int PointIdint = Convert.ToInt32(PointId);
+            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("PointId", out var _pointId))
+            {
+                //currentCount = Convert.ToInt32(=_initialCount);
+                //PointIdint = Convert.ToInt32(_pointId);
+            }
+            if (PointId != 0)
+            {
+                var resultPoint = context.Points.Where(p => p.Id == PointId).AsNoTracking().FirstOrDefault();
+                if (resultPoint == null)
+                    return context.Points.AsNoTracking().FirstOrDefault();
+            }
+            return context.Points.AsNoTracking().FirstOrDefault();
+        }
+
+        private void SetNextAdvertisement(object state)
+        {
+            CurrentAdvertisement = GetNext();
+            NextAdvertisement = GetNext();
+            advText = (CurrentAdvertisement != null) ? CurrentAdvertisement.Text : "";
+        }
+
+
+        public Advertisement GetNext()
+        {
+            Advertisement result;
+            if (CurrentAdvertisement == null)
+            {
+                result = GetFirstAdvertisement();
+                return result;
+            }
+            var advs = context.Advertisements.Where(a => a.Point == Point && a.CreateDate > CurrentAdvertisement.CreateDate).OrderBy(a => a.CreateDate).AsNoTracking();
+            //advs = advs.Where(elem => elem.CreateDate > CurrentAdvertisement.CreateDate).OrderBy(a=>a.CreateDate).AsNoTracking();
+            if (advs.Any())
+            {
+                result = advs.Where(elem => elem.CreateDate > CurrentAdvertisement.CreateDate).AsNoTracking().FirstOrDefault(); // faster than try-catch
+            }
+            else
+            {
+                result = GetFirstAdvertisement();
+            }
+            return result;
+        }
+
+        public Advertisement GetFirstAdvertisement()
+        {
+            return context.Advertisements.Where(a => a.Point == Point).OrderBy(a => a.CreateDate).AsNoTracking().FirstOrDefault();
+        }
+    }

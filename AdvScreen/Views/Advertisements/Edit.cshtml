@@ -12,12 +12,12 @@
         height: @(Model.Point.Height+"cm");
         width: @(Model.Point.Width+"cm");
         transform-origin: 0 0;
-        transform: scale(0.17);
+        transform: scale(0.16);
         /* you can calculate it by something like :
      108/326*2 = 0.663 => 0.67*/
         /* zoom:...; */ /* This is non-standard feature */
         /* FireFox and Opera don't support it */
-        border: 10px solid;
+        border: 5px solid;
         white-space: pre-line;
         /*overflow: hidden;*/
         /*white-space: nowrap;*/
@@ -92,7 +92,7 @@
                     //['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
                     ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
                     ['fontname', ['fontname']],
-                    ['fontsize', ['fontsize']],
+                    //['fontsize', ['fontsize']],
                     ['color', ['color']],
                     //['para', ['ol', 'ul', 'paragraph', 'height']],
                     //['table', ['table']]
@@ -136,29 +136,36 @@
 @model Dal.Models.Advertisement
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Изменить объявление";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Edit</h1>
 
-<h4>Advertisement</h4>
+
+
+<div class="row">
+    <h4 class="col-md-4">@ViewData["Title"]</h4>
+    <h4 class="col-md-6"><a asp-action="Index">Мои объявления</a></h4>
+</div>
 <hr />
-<div class="row" style="border: 1px solid; padding: 1px;">
-    <div class="col-md-4">
+<div class="row" style="border: 1px solid;">
+    <div class="col-md-6" style="border: 1px dotted;">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
 
             <div class="form-group">
-                <label asp-for="Text" class="control-label"></label>
+                <div class="text-center">
+                    <label asp-for="Text" class="control-label"></label>
+                </div>
+                
                 @*<input asp-for="Text" class="form-control" type="text" />*@
 
                 <textarea asp-for="Text" rows="6" class="form-control"></textarea>
                 <span asp-validation-for="Text" class="text-danger"></span>
             </div>
             <div class="form-group text-center">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Сохранить" class="btn btn-primary" />
             </div>
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
@@ -193,7 +200,7 @@
         </form>
     </div>
 
-    <div class="col-md-8 wrap" style="border: 1px dashed">
+    <div class="col-md-6 wrap" style="border: 1px dashed">
         <div class="text-center PointScreen" style="font-size: @(Model.FontSize+"px");" id="screenEmulator">
             @Html.Raw(Model.Text)
         </div>
@@ -202,7 +209,5 @@
 
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 

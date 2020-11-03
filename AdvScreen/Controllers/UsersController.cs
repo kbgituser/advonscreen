@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AdvScreen.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private ApplicationDbContext _context;

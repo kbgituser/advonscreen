@@ -31,6 +31,7 @@ namespace Screen
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages().AddRazorRuntimeCompilation();
+            
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
             

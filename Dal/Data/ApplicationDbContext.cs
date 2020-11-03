@@ -24,7 +24,15 @@ namespace Dal.Data
         public DbSet<DaysForAdv> DaysForAdvs { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);            
+            base.OnModelCreating(builder);
+
+
+            builder.Entity<Advertisement>()
+                .HasOne(r => r.ApplicationUser)
+                .WithMany(u => u.Advertisements)
+                .HasForeignKey(o => o.UserId)
+                .IsRequired()
+                ;
         }
     }
 }

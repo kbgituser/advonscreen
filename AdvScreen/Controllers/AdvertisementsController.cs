@@ -35,7 +35,9 @@ namespace AdvScreen.Controllers
         // GET: Advertisements
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Advertisements.ToListAsync());
+            ApplicationUser CurrentUser = GetCurrentUser();            
+            return View(await _context.Advertisements.Where(a=>a.UserId == CurrentUser.Id).ToListAsync());
+            
         }
 
         // GET: Advertisements/Details/5
@@ -89,6 +91,13 @@ namespace AdvScreen.Controllers
             ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
             ViewData["Points"] = new SelectList(_context.Points, "Id", "Name");
             return View(advertisement);
+        }
+
+        public string GenerateAdvertisementNumber(Advertisement Advertisement)
+        {
+            DateTime date = Advertisement.CreateDate;
+
+            return "";
         }
 
         public float Pricing(int seconds, int days, int pointId)

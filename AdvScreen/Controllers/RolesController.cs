@@ -6,9 +6,11 @@ using Dal.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Dal;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AdvScreen.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class RolesController : Controller
     {
         RoleManager<IdentityRole> _roleManager;

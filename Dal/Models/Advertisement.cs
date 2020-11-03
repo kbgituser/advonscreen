@@ -12,7 +12,7 @@ namespace Dal.Models
         public int Id { get; set; }
         
         
-        [Display(Name = "Длительность")]
+        [Display(Name = "Длительность в секундах")]
         public int Duration { get; set; }
         [Display(Name = "Длительность в днях")]
 

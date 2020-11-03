@@ -1,7 +1,7 @@
 ﻿@page "/counter"
 
 
-<h1>Countersdfsdf</h1>
+<h1>Counter</h1>
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 <p>Current count: @currentCount</p>
 <div>@advText</div>
@@ -18,8 +18,7 @@
 
     public Point Point { get; set; }
     public Advertisement CurrentAdvertisement { get; set; }
-    public Advertisement NextAdvertisement { get; set; }
-    public System.Threading.Timer aTimer;
+    public Advertisement NextAdvertisement { get; set; }    
     public int AdvertisementDuration { get; set; }
 
 
@@ -36,7 +35,7 @@
         {
             Point = context.Points.AsNoTracking().FirstOrDefault();
             //SetNextAdvertisement(null);
-            StartShow();
+            //StartShow();
         }
     }
 
@@ -128,6 +127,5 @@
         //await context.Entry(adv).ReloadAsync();
         advText = (adv != null) ? adv.Text : "";
         currentCount++;
-
     }
 }
