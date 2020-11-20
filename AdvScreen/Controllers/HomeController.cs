@@ -33,5 +33,12 @@ namespace AdvScreen.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        
+        public IActionResult ErrorHandle()
+        {
+            var test = TempData["Message"];
+            return View();
+        }
     }
 }

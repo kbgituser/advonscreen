@@ -19,11 +19,16 @@ namespace Dal.Models
         public DateTime StartDate { get; set; }
         [Display(Name = "Высота")]
         public int Height { get; set; }
+
         [Display(Name = "Ширина")]
         public int Width { get; set; }
         [Display(Name = "Рекомендуемый размер шрифта")]
         public int RecommendedFontSize { get; set; }
+        [Display(Name = "Коэфициент масштабирования (0.2 - 0.3)")]
+        public float Scale{ get; set; }
         public bool TurnedOn { get; set; }
+        [Display(Name = "Длительность одного цикла в секундах")]
+        public int CycleSize { get; set; }
 
     }
 }

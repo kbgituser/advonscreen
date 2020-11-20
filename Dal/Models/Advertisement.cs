@@ -9,13 +9,10 @@ namespace Dal.Models
 {
     public class Advertisement
     {
-        public int Id { get; set; }
-        
-        
+        public int Id { get; set; }        
         [Display(Name = "Длительность в секундах")]
         public int Duration { get; set; }
         [Display(Name = "Длительность в днях")]
-
         public int DurationInDays { get; set; }
 
         [Display(Name = "Дата создания")]
@@ -40,9 +37,13 @@ namespace Dal.Models
         public int FontSize { get; set; }
 
         [Display(Name = "Место объявления")]
+
+        [Required(ErrorMessage = "Нужно выбрать точку")]
         public int PointId { get; set; }
         public virtual Point Point { get; set; }
-        public virtual ICollection<AdvertisementStatusHistory>  AdvertisementStatusHistories { get; set; }
+        public int AdvertisementStatusId { get; set; }
+        public virtual AdvertisementStatus AdvertisementStatus { get; set; }
+        public virtual ICollection<AdvertisementStatusHistory> AdvertisementStatusHistories { get; set; }
         public AdvertisementStatus GetAdvertisementStatus()
         {
             return AdvertisementStatusHistories.OrderByDescending(a => a.ChangeDate).Any()

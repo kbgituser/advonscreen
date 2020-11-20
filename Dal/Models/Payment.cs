@@ -14,5 +14,7 @@ namespace Dal.Models
         // Цена есть в классе Advertisement
         public float Price { get; set; }
 
+        public DateTime CreateDate { get; set; }
+
     }
 }

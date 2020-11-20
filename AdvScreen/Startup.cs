@@ -38,10 +38,11 @@ namespace AdvScreen
             });
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options
-                .UseLazyLoadingProxies()
+                options                
                 .UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                    Configuration.GetConnectionString("DefaultConnection"))
+                .UseLazyLoadingProxies()
+                );
 
             //services.AddDbContext<ApplicationDbContext>(options =>
             //    options.UseSqlServer(
@@ -114,6 +115,7 @@ namespace AdvScreen
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
+                DbInitializer.Initialize(app);
             }
             else
             {

@@ -11,6 +11,16 @@
     <Compile Remove="Data\Migrations\20201021070702_ApplicationUser3.Designer.cs" />
     <Compile Remove="Data\Migrations\20201022093516_advertisementPoint.cs" />
     <Compile Remove="Data\Migrations\20201022093516_advertisementPoint.Designer.cs" />
+    <Compile Remove="Data\Migrations\20201113123300_advertisementStatusId.cs" />
+    <Compile Remove="Data\Migrations\20201113123300_advertisementStatusId.Designer.cs" />
+    <Compile Remove="Data\Migrations\20201113125424_advertisementStatusId.cs" />
+    <Compile Remove="Data\Migrations\20201113125424_advertisementStatusId.Designer.cs" />
+    <Compile Remove="Data\Migrations\20201113125618_advertisementStatusId.cs" />
+    <Compile Remove="Data\Migrations\20201113125618_advertisementStatusId.Designer.cs" />
+    <Compile Remove="Data\Migrations\20201113125744_advertisementStatusId.cs" />
+    <Compile Remove="Data\Migrations\20201113125744_advertisementStatusId.Designer.cs" />
+    <Compile Remove="Data\Migrations\20201113130606_advertisementStatusId.cs" />
+    <Compile Remove="Data\Migrations\20201113130606_advertisementStatusId.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

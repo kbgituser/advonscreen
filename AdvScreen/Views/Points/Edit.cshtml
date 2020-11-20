@@ -31,13 +31,23 @@
             </div>
             <div class="form-group">
                 <label asp-for="Height" class="control-label"></label>
-                <input asp-for="Height" class="form-control" />
+                <input asp-for="Height" class="form-control allownumericwithoutdecimal" />
                 <span asp-validation-for="Height" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Width" class="control-label"></label>
-                <input asp-for="Width" class="form-control" />
+                <input asp-for="Width" class="form-control allownumericwithoutdecimal" />
                 <span asp-validation-for="Width" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CycleSize" class="control-label"></label>
+                <input asp-for="CycleSize" class="form-control allownumericwithoutdecimal" />
+                <span asp-validation-for="CycleSize" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Scale" class="control-label"></label>
+                <input asp-for="Scale" class="form-control allownumericwithdecimal" />
+                <span asp-validation-for="Scale" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="RecommendedFontSize" class="control-label"></label>

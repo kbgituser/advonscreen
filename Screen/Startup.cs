@@ -34,15 +34,13 @@ namespace Screen
             
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-            
-
-
-
             services.AddDbContext<ApplicationDbContext>(options =>
             options
-            //.UseLazyLoadingProxies()
+            .UseLazyLoadingProxies()
             .UseSqlServer(
                 Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddScoped<BrowserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

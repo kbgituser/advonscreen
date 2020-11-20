@@ -56,7 +56,7 @@ namespace AdvScreen.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Address,Description,Length,Height,RecommendedFontSize,TurnedOn")] Point point)
+        public async Task<IActionResult> Create([Bind("Id,Name,Address,Description,Length,Height,RecommendedFontSize,TurnedOn,Scale")] Point point)
         {
             if (ModelState.IsValid)
             {
@@ -89,7 +89,7 @@ namespace AdvScreen.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,Description,StartDate,Width,Height,RecommendedFontSize,TurnedOn")] Point point)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,Description,Width,Height,RecommendedFontSize,TurnedOn,Scale,CycleSize")] Point point)
         {
             if (id != point.Id)
             {
@@ -100,7 +100,18 @@ namespace AdvScreen.Controllers
             {
                 try
                 {
-                    _context.Update(point);
+                    var editingPoing = _context.Points.FirstOrDefault(p => p.Id == id);
+                    editingPoing.Name = point.Name;
+                    editingPoing.Address = point.Address;
+                    editingPoing.Description= point.Description;
+                    editingPoing.Width= point.Width;
+                    editingPoing.Height= point.Height;
+                    editingPoing.Scale = point.Scale;
+                    editingPoing.CycleSize = point.CycleSize;
+                    editingPoing.RecommendedFontSize= point.RecommendedFontSize;
+                    editingPoing.TurnedOn = point.TurnedOn;
+
+                    _context.Update(editingPoing);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

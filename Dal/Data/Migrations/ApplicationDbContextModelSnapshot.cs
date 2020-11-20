@@ -29,8 +29,8 @@ namespace Dal.Data.Migrations
                     b.Property<string>("AdNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("AdvertisementStatusId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
@@ -63,13 +63,16 @@ namespace Dal.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("AdvertisementStatusId");
 
                     b.HasIndex("PointId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Advertisements");
                 });
@@ -84,6 +87,9 @@ namespace Dal.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("NameRu")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("AdvertisementStatuses");
@@ -96,10 +102,7 @@ namespace Dal.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("AdvId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AdvertisementId")
+                    b.Property<int>("AdvertisementId")
                         .HasColumnType("int");
 
                     b.Property<int>("AdvertisementStatusId")
@@ -224,6 +227,35 @@ namespace Dal.Data.Migrations
                     b.ToTable("DaysForAdvs");
                 });
 
+            modelBuilder.Entity("Dal.Models.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AdvertisementId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Days")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Sum")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdvertisementId");
+
+                    b.ToTable("Payments");
+                });
+
             modelBuilder.Entity("Dal.Models.Point", b =>
                 {
                     b.Property<int>("Id")
@@ -233,6 +265,9 @@ namespace Dal.Data.Migrations
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CycleSize")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -245,6 +280,9 @@ namespace Dal.Data.Migrations
 
                     b.Property<int>("RecommendedFontSize")
                         .HasColumnType("int");
+
+                    b.Property<float>("Scale")
+                        .HasColumnType("real");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -437,13 +475,21 @@ namespace Dal.Data.Migrations
 
             modelBuilder.Entity("Dal.Models.Advertisement", b =>
                 {
-                    b.HasOne("Dal.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId");
+                    b.HasOne("Dal.Models.AdvertisementStatus", "AdvertisementStatus")
+                        .WithMany("Advertisements")
+                        .HasForeignKey("AdvertisementStatusId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Dal.Models.Point", "Point")
                         .WithMany()
                         .HasForeignKey("PointId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dal.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Advertisements")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -452,11 +498,22 @@ namespace Dal.Data.Migrations
                 {
                     b.HasOne("Dal.Models.Advertisement", "Advertisement")
                         .WithMany("AdvertisementStatusHistories")
-                        .HasForeignKey("AdvertisementId");
+                        .HasForeignKey("AdvertisementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Dal.Models.AdvertisementStatus", "AdvertisementStatus")
                         .WithMany()
                         .HasForeignKey("AdvertisementStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Dal.Models.Payment", b =>
+                {
+                    b.HasOne("Dal.Models.Advertisement", "Advertisement")
+                        .WithMany()
+                        .HasForeignKey("AdvertisementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

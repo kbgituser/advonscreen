@@ -11,6 +11,9 @@
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.AdvertisementStatus.NameRu)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.AdNumber)
             </th>
             <th>
@@ -41,6 +44,9 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdvertisementStatus.NameRu)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.AdNumber)
             </td>

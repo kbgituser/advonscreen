@@ -14,8 +14,26 @@
     <base href="~/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
+    <script type="text/javascript">
+        window.getDimensions = function () {
+            return {                
+                width: document.body.clientWidth || window.innerWidth ,
+                height: document.body.clientHeight || window.innerHeight 
+            };
+        };
+    </script>
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+        }
+    </style>
+
 </head>
-<body>
+<body style="overflow: hidden;">
     <app>
         <component type="typeof(App)" render-mode="ServerPrerendered" />
     </app>
