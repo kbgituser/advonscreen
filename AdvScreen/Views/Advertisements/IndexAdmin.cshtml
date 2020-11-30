@@ -1,0 +1,107 @@
+﻿@model IEnumerable<Dal.Models.Advertisement>
+@{
+    ViewData["Title"] = "Ваши объявления";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1>Ваши объявления</h1>
+<p>
+    <a asp-action="Create">Создать новое объявление</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.AdvertisementStatus.NameRu)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AdNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Duration)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DurationInDays)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreateDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                Оплата
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdvertisementStatus.NameRu)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Duration)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DurationInDays)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreateDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EndDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @if (item.AdvertisementStatus.Name == "ForPayment")
+                {
+                    <a asp-action="Payment" asp-route-id="@item.Id">Оплата наличными</a>
+                }
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Изменить</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Детали</a> |
+
+                @switch (item.AdvertisementStatus.Name)
+                {
+                    case "InModeration":
+                        <a asp-action="Moderate" asp-route-id="@item.Id">Модерация</a><span>|</span>                        
+                        break;
+                    @*case "ForPayment":
+                        <a asp-action="Payment" asp-route-id="@item.Id">Оплата наличными</a><span>|</span>
+                        break;*@
+                }
+
+                @*@if (item.AdvertisementStatus.Name == "InModeration")
+                {
+                    <a asp-action="Moderate" asp-route-id="@item.Id">Модерация</a><span>|</span>
+                }
+                *@
+
+                <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

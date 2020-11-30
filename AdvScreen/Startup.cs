@@ -59,6 +59,10 @@ namespace AdvScreen
               //.AddRoleManager<RoleManager<IdentityRole>>()
               ;
 
+            services.AddControllersWithViews().AddNewtonsoftJson(options =>
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
+
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings.
@@ -131,11 +135,18 @@ namespace AdvScreen
             app.UseAuthentication();
             app.UseAuthorization();
 
+            
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapControllerRoute(
+                    name: "DefaultApi",
+                    pattern: "api/{controller}/{action}/{id}");
+
                 endpoints.MapRazorPages();
             });
         }

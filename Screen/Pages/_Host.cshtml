@@ -50,5 +50,12 @@
     </div>
 
     <script src="_framework/blazor.server.js"></script>
+    <environment include="Development">
+        <script >
+            window.Blazor.defaultReconnectionHandler.onConnectionDown = function () {
+                window.location.reload();
+            };
+        </script>
+    </environment>
 </body>
 </html>
