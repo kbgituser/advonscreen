@@ -82,11 +82,14 @@
                 lang: 'ru-RU',
                 callbacks: {
                     onKeyup: function (e) {
+                        
                         $('#screenEmulator').html($(this).val());
+                        
                     }
                     ,
                     onPaste: function (e) {
                         $('#screenEmulator').html($(this).val());
+                        
                     }
                     ,
                     onBlur: function (e) {
@@ -257,6 +260,7 @@
         <div class="PointScreen" style="font-size: @(Model.FontSize+"px");" id="screenEmulator">
             @Html.Raw(Model.Text)
         </div>
-
     </div>
+    
 </div>
+@*<img src="@Url.Action("HtmlToPng", "Advertisements", new { Model.Id })" />*@

@@ -28,6 +28,9 @@ namespace Dal.Models
         [DataType(DataType.MultilineText)]
         public string Text { get; set; }
         [Display(Name = "Номер объявления")]
+
+        public string DataUrl { get; set; }
+        
         public string AdNumber { get; set; }
         [Display(Name = "Цена")]
         public float Price { get; set; }

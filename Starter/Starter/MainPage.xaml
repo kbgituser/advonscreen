@@ -22,11 +22,11 @@
     </StackLayout>-->
 
     <StackLayout>
-        <StackLayout Orientation="Horizontal">
+        <!--<StackLayout Orientation="Horizontal">
             <Button Text="Go" Clicked="button_Clicked" />
             <Entry x:Name="urlEntry" HorizontalOptions="FillAndExpand" />
-        </StackLayout>
-        <WebView x:Name="webView" VerticalOptions="FillAndExpand" >
+        </StackLayout>-->
+        <WebView x:Name="webView" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
             <WebView.Source>
                 <HtmlWebViewSource x:Name="viewSource"/>
             </WebView.Source>

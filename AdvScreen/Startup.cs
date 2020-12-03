@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Dal.Models;
 using Dal.Data;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace AdvScreen
 {
@@ -128,6 +129,14 @@ namespace AdvScreen
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
+
+            FileExtensionContentTypeProvider contentTypes = new FileExtensionContentTypeProvider();
+            contentTypes.Mappings[".apk"] = "application/vnd.android.package-archive";
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                ContentTypeProvider = contentTypes
+            });
+
             app.UseStaticFiles();
 
             app.UseRouting();

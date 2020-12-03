@@ -19,7 +19,7 @@
         108/326*2 = 0.663 => 0.67*/
         /* zoom:...; */ /* This is non-standard feature */
         /* FireFox and Opera don't support it */
-        border: 2px solid;        
+        border: 2px solid;
         /*white-space: pre-line;*/
         white-space: normal;
         /*overflow: hidden;*/
@@ -28,9 +28,15 @@
 
     .wrap {
         /*transform: scale(0.17);*/
-        height: 100px;
+        height: 960px;
         /*border: 1px dashed;*/
         /*width: 50px;*/
+    }
+
+    .hide-scrollbar {
+        overflow: -moz-hidden-unscrollable;
+        overflow: hidden;
+
     }
 
     /*.wrap:hover {
@@ -60,9 +66,9 @@
         <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>*@
 
     @*<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>*@
-    
-    <link href="~/lib/summernote-0.8.18-dist/summernote-bs4.min.css" rel="stylesheet">    
+        <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>*@
+
+    <link href="~/lib/summernote-0.8.18-dist/summernote-bs4.min.css" rel="stylesheet">
     <script src="~/lib/summernote-0.8.18-dist//summernote-bs4.min.js"></script>
     <script src="~/lib/summernote-0.8.18-dist/lang/summernote-ru-RU.js"></script>
 
@@ -76,6 +82,10 @@
     @*<script>tinymce.init({ selector: 'textarea' });</script>*@
     @*<script>tinymce.init({ selector: "#Text" });</script>*@
     @*TinyMce*@
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="~/js/jquery.plugin.html2canvas.js"></script>
+    
     <script>
         $(function () {
 
@@ -133,7 +143,79 @@
             //    $('div[id$=screenEmulator]').text($(this).val());
             //});
 
+            $('#EditForm').submit(function () {
+                //alert("fire in jq 1");
+
+                //canvasRecord = $('#screenEmulator').html2canvas();
+                //return false;
+
+                //dataURL = canvasRecord.toDataURL("image/png");
+                //alert(dataURL);
+
+                //html2canvas($('#screenEmulator'), {
+                //    onrendered: function (canvas) {
+                //        alert("sdfsdf");
+                //        var img = canvas.toDataURL("image/png")
+                //        alert(img);
+                //        window.open(img);
+                //    }
+                //});
+
+                //html2canvas(document.getElementById("screenEmulator"), {
+                //    onrendered: function (canvas) {
+                //        alert("Jquery canvas inside");
+                //        //document.getElementById('img_val').value = canvas.toDataURL("image/png");
+                //        //document.getElementById("myForm").submit();
+
+                //    }
+                //});
+
+                
+                
+
+                $("html").addClass("hide-scrollbar");                
+                //html2canvas(document.getElementById('screenEmulator')).then(function (canvas) {
+                //    //alert("fire");
+                //    var dataURL = canvas.toDataURL();                    
+                //    alert(dataURL);                    
+                //    window.open(dataURL);
+                //    //document.body.appendChild(canvas);
+                //});
+
+                
+
+                //html2canvas(document.querySelector("#screenEmulator")
+                //    , {
+                //        letterRendering: true                        
+                //       }
+                //).then(canvas => {
+                //    var dataURL = canvas.toDataURL();                    
+                //    window.open(dataURL);                    
+                //});
+                //console.log("Done!")
+                //$("#html").removeClass("hide-scrollbar");
+                FormSubmit();
+                setTimeout(() => { console.log("World!"); }, 100000);
+                return true;
+            });
+            
+
         });
+
+        function FormSubmit()
+        {            
+            html2canvas(document.getElementById('screenEmulator')).then(function (canvas) {
+                alert("fire");
+                var dataURL = canvas.toDataURL();
+                console.log(dataURL);
+                alert(dataURL);
+            //        //document.body.appendChild(canvas);
+            });
+            setTimeout(() => { console.log("World!"); }, 100000);
+            return false;
+        }
+
+
     </script>
 
 
@@ -154,7 +236,7 @@
 <hr />
 <div class="row" style="border: 1px solid;">
     <div class="col-md-6" style="border: 1px dotted;">
-        <form asp-action="Edit">
+        <form asp-action="Edit" id="EditForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
 
@@ -167,9 +249,11 @@
 
                 <textarea asp-for="Text" rows="6" class="form-control"></textarea>
                 <span asp-validation-for="Text" class="text-danger"></span>
+                <input type="hidden" asp-for="DataUrl" id="DataUrl"/>
             </div>
             <div class="form-group text-center">
-                <input type="submit" value="Сохранить" class="btn btn-primary" />
+                <input type="submit" value="Сохранить" class="btn btn-primary" @*onclick="return FormSubmit();"*@ />
+                
                 @if (Model.AdvertisementStatus.Name.Contains("Created") || Model.AdvertisementStatus.Name.Contains("Finished"))
                 {
                     <a asp-controller="Advertisements"
@@ -193,7 +277,7 @@
                        class="btn btn-primary">Завершить</a>
                 }
             </div>
-            
+
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
@@ -233,10 +317,15 @@
         </form>
     </div>
 
-    <div class="col-md-6 wrap">
+    <div class="col-md-6 wrap" id="wrap">
         <div class="PointScreen" style="font-size: @(Model.FontSize+"px");" id="screenEmulator">
             @Html.Raw(Model.Text)
         </div>
-
     </div>
 </div>
+@*<div class="row" >
+        <div class="col-md-6 wrap" style="border: 1px solid;">
+            <img src="@Url.Action("HtmlToPng", "Advertisements", new { Model.Id })" />
+        </div>
+    </div>*@
+

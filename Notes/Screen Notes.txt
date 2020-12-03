@@ -36,3 +36,5 @@ https://www.youtube.com/watch?v=2amu_qxK4hU
 https://www.wildberries.kz/catalog/2358155/detail.aspx?targetUrl=BP
 
 https://www.aliexpress.com/item/1005001700793350.html?spm=a2g0o.productlist.0.0.29a14dc8ji77IW&algo_pvid=cf7d9caa-0f74-489b-8b69-5e4d050b2e2c&algo_expid=cf7d9caa-0f74-489b-8b69-5e4d050b2e2c-0&btsid=0bb0622916066394837321785e2323&ws_ab_test=searchweb0_0,searchweb201602_,searchweb201603_
+
+https://github.com/juancgarcia/screenshotify/blob/master/Downloadify-652377f/js/jquery.plugin.html2canvas.js.original

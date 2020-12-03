@@ -12,6 +12,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
+
+using System.IO;
+using CoreHtmlToImage;
+
+
 namespace AdvScreen.Controllers
 {
     [Authorize]
@@ -279,6 +284,32 @@ namespace AdvScreen.Controllers
             return View(advertisement);
         }
 
+        //public async Task<IActionResult> HtmlToPng(Advertisement model)
+        public async Task<FileResult> HtmlToPng(int id)
+        {
+
+            
+
+
+            var adv = _context.Advertisements.FirstOrDefault(a => a.Id == id);
+            var converter = new HtmlConverter();
+
+
+            
+
+            var html = "<div><strong>Hello</strong> World!</div>";
+
+            html = "<style>";
+            html += ".PointScreen {height: 960px; width: 540px; border: 2px solid; font-size: 99px;}";
+            html += "</style>";
+            html += "<div class='PointScreen'>";
+            html += adv.Text;
+            html += "</div>";
+            var bytes = converter.FromHtmlString(html);
+            return File(bytes, "image/png");            
+        }
+        
+
         // POST: Advertisements/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -325,10 +356,11 @@ namespace AdvScreen.Controllers
                 }
                 //return RedirectToAction(nameof(Index));
                 var adv = _context.Advertisements.FirstOrDefault(a => a.Id == id);
-                return View(adv);
+                //return View(adv);
+                return RedirectToAction("Edit", new { adv.Id });
             }
-            
-            return View(advertisement);
+            return RedirectToAction("Edit", new { id });
+            //return View(advertisement);
         }
 
         
