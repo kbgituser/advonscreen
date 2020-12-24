@@ -28,9 +28,6 @@ namespace Dal.Models
         [DataType(DataType.MultilineText)]
         public string Text { get; set; }
         [Display(Name = "Номер объявления")]
-
-        public string DataUrl { get; set; }
-        
         public string AdNumber { get; set; }
         [Display(Name = "Цена")]
         public float Price { get; set; }
@@ -46,7 +43,20 @@ namespace Dal.Models
         public virtual Point Point { get; set; }
         public int AdvertisementStatusId { get; set; }
         public virtual AdvertisementStatus AdvertisementStatus { get; set; }
+
+        [Display(Name = "Содержание")]
+        public AdvertisementType AdvertisementType { get; set; }
+
+        [Display(Name = "Цвет фона")]
+        public string BackgroundColor { get; set; } = "#FFFFFF";
+        
+        [Display(Name = "Фотография")]
+        public string ImagePath { get; set; } 
+        
+        [Display(Name = "Видео")]
+        public string Video { get; set; } 
         public virtual ICollection<AdvertisementStatusHistory> AdvertisementStatusHistories { get; set; }
+        public virtual ICollection<Payment> Payments { get; set; }
         public AdvertisementStatus GetAdvertisementStatus()
         {
             return AdvertisementStatusHistories.OrderByDescending(a => a.ChangeDate).Any()

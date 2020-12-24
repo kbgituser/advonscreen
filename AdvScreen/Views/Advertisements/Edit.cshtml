@@ -5,32 +5,35 @@
     }
 
     .PointScreen {
-        /* this is the render are dimension */
-        /* media queries look up to this */
-        height: @(Model.Point.Height + "px");
-        width: @(Model.Point.Width + "px");
-        /*height: 1079px;
-        width: 1918px;*/
-        transform-origin: 0 0;
-        /*transform: scale(0.287);*/
-        transform: scale(@Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture));
 
-        /* you can calculate it by something like :
-        108/326*2 = 0.663 => 0.67*/
-        /* zoom:...; */ /* This is non-standard feature */
-        /* FireFox and Opera don't support it */
-        border: 2px solid;        
-        /*white-space: pre-line;*/
+        height: @(Model.Point.Height+"px");
+        width: @(Model.Point.Width+"px");
+        transform-origin: 0 0;
+        transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture));
+
+        border: 2px solid;
+        padding-left: 5%; padding-right: 5%; /*need to think about*/
         white-space: normal;
-        /*overflow: hidden;*/
+        overflow: hidden;
         /*white-space: nowrap;*/
     }
+    p {line-height: 1; margin-bottom: 0; margin-top: 0;}
 
     .wrap {
-        /*transform: scale(0.17);*/
         height: 100px;
-        /*border: 1px dashed;*/
-        /*width: 50px;*/
+        width: 100px;
+        @*height: @((Model.Point.Height* Model.Point.Scale) -280 +"px");*@
+        border: dotted 3px;
+    }
+
+    .center {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hide-scrollbar {
+        overflow: -moz-hidden-unscrollable;
+        overflow: hidden;
     }
 
     /*.wrap:hover {
@@ -260,7 +263,6 @@
         <div class="PointScreen" style="font-size: @(Model.FontSize+"px");" id="screenEmulator">
             @Html.Raw(Model.Text)
         </div>
-    </div>
-    
+    </div>    
 </div>
-@*<img src="@Url.Action("HtmlToPng", "Advertisements", new { Model.Id })" />*@
+

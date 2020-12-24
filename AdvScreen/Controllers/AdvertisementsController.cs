@@ -15,7 +15,8 @@ using System.Security.Claims;
 
 using System.IO;
 using CoreHtmlToImage;
-
+using Microsoft.AspNetCore.Hosting;
+using AdvScreen.Models;
 
 namespace AdvScreen.Controllers
 {
@@ -26,27 +27,115 @@ namespace AdvScreen.Controllers
         private readonly ApplicationDbContext _context;
         private UserManager<ApplicationUser> _userManager;
         private RoleManager<IdentityRole> _roleManager;
+        private IWebHostEnvironment _env;
 
         public AdvertisementsController(ApplicationDbContext context,
             UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor
+            , IWebHostEnvironment appEnvironment
+            )
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
             _httpContextAccessor = httpContextAccessor;
+            _env = appEnvironment;
         }
 
         // GET: Advertisements
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string adNumber
+            , string advertisementStatus
+            ,string pointId
+            , string price
+            , string sortOrder
+            , int? p
+            )
         {
+            //ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
+            ViewData["points"] = new SelectList(_context.Points, "Id", "Name");
+            ViewData["advertisementStatuses"] = new SelectList(_context.AdvertisementStatuses, "Id", "NameRu");
+            
             ApplicationUser CurrentUser = GetCurrentUser();
+            //var advertisements = _context.Advertisements.AsQueryable();
+            var advertisements = _context.Advertisements.AsQueryable();
+            AdvertisementStatus curStatus;
+            int curPointId, curPrice;
+            if (!string.IsNullOrEmpty(adNumber))
+            {
+                advertisements = advertisements.Where(a => a.AdNumber.Contains(adNumber));
+                ViewData["adNumber"] = adNumber;
+            }
+
+            if (!string.IsNullOrEmpty(advertisementStatus))
+            {
+                curStatus = _context.AdvertisementStatuses.FirstOrDefault(s => s.Id == Int32.Parse(advertisementStatus));
+                advertisements = advertisements.Where(a => a.AdvertisementStatus == curStatus);
+                ViewData["advertisementStatuses"] = new SelectList(_context.AdvertisementStatuses, "Id", "NameRu", curStatus.Id);
+                ViewData["advertisementStatus"] = curStatus.Id;
+            }
+
+            if (!string.IsNullOrEmpty(pointId))
+            {
+                curPointId = Int32.Parse(pointId);
+                advertisements = advertisements.Where(a => a.PointId == curPointId);                
+                ViewData["points"] = new SelectList(_context.Points, "Id", "Name", curPointId);
+                ViewData["pointId"] = curPointId;
+            }
+
+            if (!string.IsNullOrEmpty(price))
+            {
+                curPrice = Int32.Parse(price);
+                advertisements = advertisements.Where(a => a.Price<=curPrice);                
+            }
+            
             if (await _userManager.IsInRoleAsync(CurrentUser, "Admin"))
             {
-                return View("IndexAdmin",  _context.Advertisements.Include(a=>a.AdvertisementStatus).AsAsyncEnumerable());
-                //return View(await _context.Advertisements.ToListAsync());
-            }                
-            return View(await _context.Advertisements.Where(a=>a.UserId == CurrentUser.Id).Include(a => a.AdvertisementStatus).ToListAsync());
+                advertisements = advertisements.Include(a => a.AdvertisementStatus);
+                //return View("IndexAdmin",  advertisements.Include(a=>a.AdvertisementStatus).AsQueryable());
+            }
+            else
+            {
+                //return View(advertisements.Where(a => a.UserId == CurrentUser.Id).Include(a => a.AdvertisementStatus));
+                advertisements = advertisements.Where(a => a.UserId == CurrentUser.Id).Include(a => a.AdvertisementStatus);
+            }
+            ViewData["adNumberSort"] = sortOrder == "adNumber" ? "adNumberDesc" : "adNumber";
+            ViewData["createDateSort"] = sortOrder == "createDate" ? "createDateDesc" : "createDate";
+            switch (sortOrder)
+            {
+                case "adNumberDesc":
+                    advertisements = advertisements.OrderByDescending(s => s.AdNumber);
+                    break;
+                case "adNumber":
+                    advertisements = advertisements.OrderBy(s => s.AdNumber);
+                    break;
+                case "createDateDesc":
+                    advertisements = advertisements.OrderByDescending(s => s.CreateDate);
+                    break;
+                case "createDate":
+                    advertisements = advertisements.OrderBy(s => s.CreateDate);
+                    break;
+                default:
+                    advertisements = advertisements.OrderBy(s => s.AdNumber);
+                    break;
+            }
+
+            int pageSize = 3;            
+            int pN = p ?? 1;
+            
+            ViewBag.PageNo = pN;
+            ViewBag.PageSize = 3;
+            ViewBag.TotalRecords = advertisements.Count();
+
+            if (await _userManager.IsInRoleAsync(CurrentUser, "Admin"))
+            {
+                return View("IndexAdmin",await PaginatedList<Advertisement>.CreateAsync(advertisements.AsNoTracking(), pN, pageSize));
+                //return View("IndexAdmin", advertisements);
+            }
+            else
+            {                
+                return View(await PaginatedList<Advertisement>.CreateAsync(advertisements.AsNoTracking(), pN, pageSize));
+                //return View(advertisements);
+            }
         }
 
         // GET: Advertisements/Details/5
@@ -86,7 +175,7 @@ namespace AdvScreen.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Duration,DurationInDays,Title,Text,PointId")] Advertisement advertisement)
+        public async Task<IActionResult> Create([Bind("Id,Duration,DurationInDays,Title,Text,PointId,AdvertisementType")] Advertisement advertisement)
         {
             ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs, "Seconds", "Name");
             ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
@@ -111,6 +200,7 @@ namespace AdvScreen.Controllers
                 advertisement.Price = Pricing(advertisement.Duration, advertisement.DurationInDays, advertisement.PointId);
                 advertisement.AdvertisementStatusId = _context.AdvertisementStatuses.FirstOrDefault(s => s.Name == "Created").Id;
                 advertisement.AdNumber = GenerateAdvertisementNumber(advertisement);
+                advertisement.BackgroundColor = "#FFFFFF";                
                 _context.Add(advertisement);                
                 await _context.SaveChangesAsync();
                 
@@ -123,9 +213,9 @@ namespace AdvScreen.Controllers
                 
                 return RedirectToAction(nameof(Edit),new { id = advertisement.Id});
             }
-            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs, "Seconds", "Name");
-            ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
-            ViewData["Points"] = new SelectList(_context.Points, "Id", "Name");
+            //ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs, "Seconds", "Name");
+            //ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
+            //ViewData["Points"] = new SelectList(_context.Points, "Id", "Name");
             return View(advertisement);
         }
 
@@ -174,7 +264,10 @@ namespace AdvScreen.Controllers
             if (advertisement == null || advertisement.AdvertisementStatus.Name != "InModeration")
             {
                 return NotFound();
-            }            
+            }
+            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs, "Seconds", "Name");
+            ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
+            ViewData["Points"] = new SelectList(_context.Points, "Id", "Name");
             return View(advertisement);
         }
 
@@ -286,11 +379,7 @@ namespace AdvScreen.Controllers
 
         //public async Task<IActionResult> HtmlToPng(Advertisement model)
         public async Task<FileResult> HtmlToPng(int id)
-        {
-
-            
-
-
+        {            
             var adv = _context.Advertisements.FirstOrDefault(a => a.Id == id);
             var converter = new HtmlConverter();
 
@@ -315,7 +404,7 @@ namespace AdvScreen.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Duration,DurationInDays,CreateDate,StartDate,EndDate,Title,Text,AdNumber,Price,UserId,PointId,FontSize")] Advertisement advertisement)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Duration,DurationInDays,CreateDate,StartDate,EndDate,Title,Text,AdNumber,Price,UserId,PointId,FontSize,BackgroundColor,AdvertisementType,Video")] Advertisement advertisement, IFormFile uploadedFile, bool forModeration)
         {
             if (id != advertisement.Id)
             {
@@ -329,8 +418,7 @@ namespace AdvScreen.Controllers
             {
                 try
                 {
-                    var curAdv = _context.Advertisements.FirstOrDefault(a => a.Id == id);
-                    
+                    var curAdv = _context.Advertisements.FirstOrDefault(a => a.Id == id);                    
                     curAdv.PointId = advertisement.PointId;
                     curAdv.Title = advertisement.Title;
                     curAdv.Text = advertisement.Text;
@@ -339,9 +427,41 @@ namespace AdvScreen.Controllers
                     curAdv.FontSize = advertisement.FontSize;
                     curAdv.Price = Pricing(curAdv.Duration, curAdv.DurationInDays, curAdv.PointId);
                     curAdv.AdNumber = GenerateAdvertisementNumber(curAdv);
-
+                    curAdv.BackgroundColor = advertisement.BackgroundColor;
+                    curAdv.AdvertisementType = advertisement.AdvertisementType;
+                    curAdv.Video = advertisement.Video;
                     _context.Update(curAdv);
+
+
+                    if (uploadedFile != null)
+                    {
+                        // путь к папке Files
+                        // Initialization.  
+                        var fileSize = uploadedFile.Length;
+                        int allowedFileSize = 1000000;
+                        // Settings.  
+                        bool isValid = fileSize <= allowedFileSize;
+
+                        if (isValid)
+                        {
+                            string fileExtension = System.IO.Path.GetExtension(uploadedFile.FileName);
+                            //string path = _env.ContentRootPath + "/Files/Images/" + curAdv.AdNumber + fileExtension;
+                            string path = _env.WebRootPath + "/Files/Images/" + curAdv.AdNumber + fileExtension;
+                            // сохраняем файл в папку Files в каталоге wwwroot
+                            using (var fileStream = new FileStream(path, FileMode.Create))
+                            {
+                                await uploadedFile.CopyToAsync(fileStream);
+                            }
+                            curAdv.ImagePath = "/Files/Images/" + curAdv.AdNumber +fileExtension;
+                        }
+                        else
+                        {
+                            TempData["photoMessage"] = "Фотография должна быть меньше 1 Мегабайта!!!";
+                        }
+                    }
+
                     await _context.SaveChangesAsync();
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -357,6 +477,12 @@ namespace AdvScreen.Controllers
                 //return RedirectToAction(nameof(Index));
                 var adv = _context.Advertisements.FirstOrDefault(a => a.Id == id);
                 //return View(adv);
+
+                if (forModeration)
+                {
+                    return RedirectToAction("SendToModeration", new { adv.Id });
+                }
+
                 return RedirectToAction("Edit", new { adv.Id });
             }
             return RedirectToAction("Edit", new { id });
@@ -406,12 +532,13 @@ namespace AdvScreen.Controllers
 
             if (wait)
             {
-                advertisement.AdvertisementStatusId = _context.AdvertisementStatuses.FirstOrDefault(s => s.Name == "Wating").Id;
+                advertisement.AdvertisementStatusId = _context.AdvertisementStatuses.FirstOrDefault(s => s.Name == AdvertisementStatusEnum.Waiting.ToString()).Id;
             }
             else
             {
-                var activeStatus = _context.AdvertisementStatuses.FirstOrDefault(a => a.Name == "Active");
-                if (_context.Advertisements.Where(a => a.PointId == advertisement.PointId && a.AdvertisementStatusId == activeStatus.Id).Sum(a=>a.Duration) <= advertisement.Point.CycleSize)
+                var activeStatus = _context.AdvertisementStatuses.FirstOrDefault(a => a.Name == AdvertisementStatusEnum.Active.ToString());
+                int takenTime = _context.Advertisements.Where(a => a.PointId == advertisement.PointId && a.AdvertisementStatusId == activeStatus.Id).Sum(a => a.Duration);
+                if (takenTime <= advertisement.Point.CycleSize)
                 {
                     advertisement.AdvertisementStatusId = activeStatus.Id;
                     advertisement.StartDate = DateTime.Now;
@@ -419,7 +546,7 @@ namespace AdvScreen.Controllers
                 }
                 else
                 {
-                    ViewBag.Message = "Цикл полный. Объявление не помещяется.";
+                    TempData["Message"] = "Цикл полный. Объявление не помещяется.";
                     return RedirectToAction("Payment", new { id = id });
                 }
             }
@@ -512,6 +639,45 @@ namespace AdvScreen.Controllers
                 ad.AdvertisementStatus.Id = finishStatus.Id;
             }
             _context.SaveChangesAsync();
+        }
+
+        public async Task<IActionResult> MakeWaitingAdsActive()
+        {
+            int pointId;
+            int count = 0;
+            AdvertisementStatus activeStatus;
+            activeStatus = _context.AdvertisementStatuses.SingleOrDefault(a => a.Name == AdvertisementStatusEnum.Active.ToString());
+
+            string test2 = AdvertisementStatusEnum.Waiting.ToString();
+            var test = _context.Advertisements.Where(a =>
+                a.AdvertisementStatus.Name == AdvertisementStatusEnum.Waiting.ToString()).ToList();
+
+            foreach (var point in _context.Points.ToList())
+            {
+                pointId = point.Id;
+                
+                //выбираем все объявления со статусом "в ожидании" для каждой точки отдельно
+                // сортируем их по дате создания платежа, чтобы те которые оплачивали раньше, были в очереди первыми
+                var waitingAdvertisements = _context.Advertisements.Where(a => 
+                a.AdvertisementStatus.Name == AdvertisementStatusEnum.Waiting.ToString()
+                && a.PointId == pointId)
+                    // берем последнюю оплату конкретного объявления. по дате оплаты сортируем все объявления.
+                    .OrderBy(a=>a.Payments.OrderBy(p=>p.CreateDate).Last().CreateDate)
+                    .Include(a => a.AdvertisementStatus).ToList();
+                int freeSpaceInPoint = point.CycleSize - _context.Advertisements.Where(a => a.AdvertisementStatus.Name == "Active" && a.PointId == pointId).Sum(a => a.Duration);
+                
+                var waitingToActive = waitingAdvertisements.TakeWhile(x => (count += x.Duration) <= freeSpaceInPoint);
+
+                
+                foreach (var ad in waitingToActive)
+                {
+                    ad.AdvertisementStatusId = activeStatus.Id;
+                    ad.StartDate = DateTime.Now;
+                    ad.EndDate = ad.StartDate.AddDays(ad.DurationInDays);
+                }                
+            }
+            _context.SaveChangesAsync();
+            return View();
         }
     }
 }

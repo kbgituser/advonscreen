@@ -32,11 +32,14 @@ namespace Dal.Data.Migrations
                     b.Property<int>("AdvertisementStatusId")
                         .HasColumnType("int");
 
+                    b.Property<int>("AdvertisementType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BackgroundColor")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("DataUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Duration")
                         .HasColumnType("int");
@@ -49,6 +52,9 @@ namespace Dal.Data.Migrations
 
                     b.Property<int>("FontSize")
                         .HasColumnType("int");
+
+                    b.Property<string>("ImagePath")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PointId")
                         .HasColumnType("int");
@@ -68,6 +74,9 @@ namespace Dal.Data.Migrations
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Video")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

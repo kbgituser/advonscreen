@@ -18,7 +18,7 @@ namespace Starter
         //Entry urlEntry;
         
         //public HtmlWebViewSource viewSource;
-        public int PointId = 1;
+        public int PointId = 2;
         public Cycle cycle;
         public bool Connected { get; set; }
 
@@ -43,11 +43,12 @@ namespace Starter
             Connected = Connectivity.NetworkAccess == NetworkAccess.Internet;
             string uri = "https://adv.kenseler.kz/adsapi/";            
             
-            cycle = new Cycle(1, uri);
+            cycle = new Cycle(PointId, uri);
             cycle.onAdvChange += RefreshText;
             cycle.Init();
             cycle.InternetConnected = (Connectivity.NetworkAccess == NetworkAccess.Internet);
             cycle.StartShowAsync(); // тоже работает
+            
         }
 
         void Connectivity_ConnectivityChanged(object sender, ConnectivityChangedEventArgs e)
@@ -72,18 +73,36 @@ namespace Starter
                 {
                     var html = "";
                     html += "<style>";
+                    html += "html, body {margin:0px;padding:0px;}";
                     html += ".PointScreen {" +
 
                     //"height: 100vh;" +
-                    //"width: 100vw;" +
+                    "height: 100%;"+
+
 
                     //"height: " + cycle.CurrentAdvertisement.Point.Height + "px;" +
                     //"width: " + cycle.CurrentAdvertisement.Point.Width + "px;" +
                     //"min-height: " + cycle.CurrentAdvertisement.Point.Height + "px;" +
                     //"min-width: " + cycle.CurrentAdvertisement.Point.Width + "px;" +
                     //"display: inline-block;" +
-                    //"overflow: hidden;" +
-                    "font-size: " + cycle.CurrentAdvertisement.FontSize + "px;}";
+                    "overflow: -moz-hidden-unscrollable;" +
+                    "overflow: hidden;" +
+                    "transform-origin: 0 0;" +
+                    "border: 2px solid;" +
+                    "white-space: normal;" +
+                    //"line-height: 0.8;" +                    
+                    //"line-height: 1;" +                    
+                    "background-color: red;"+
+
+                    //"background-image: linear-gradient(to bottom,rgba(240, 255, 40, 1) 0%,"+
+                    //    "rgba(240, 255, 40, 1) 100%),linear - gradient(to bottom,rgba(240, 40, 40, 1) 0%,rgba(240, 40, 40, 1) 100%);"+
+                    //"background-clip: content-box, padding-box;"+
+
+                    "font-size: " + cycle.CurrentAdvertisement.FontSize + "px;}"
+                    + "p {line-height: 1; margin-bottom: 0; margin-top: 0; margin: 0;}"
+
+                    ;
+
                     html += "</style>";
                     html += "<div class='PointScreen'>";
                     //html += "Ширина - "+webView.Width + "; Высота - " + webView.Height+";";
@@ -92,8 +111,7 @@ namespace Starter
                     html += "</div>";
                     
 
-                    viewSource.Html = html;
-                    
+                    viewSource.Html = html;                    
                     webView.Source = viewSource;
                 }
                 catch (Exception e)
@@ -125,7 +143,7 @@ namespace Starter
                 var text = result.Text;
                 
                 viewSource.Html = text;
-                webView.Source = viewSource;
+                webView.Source = viewSource;                
             }
 
             catch (TaskCanceledException e)
