@@ -1,29 +1,46 @@
-﻿<style>
+﻿@model Dal.Models.Advertisement
+@using Dal.Models
 
+
+<style>
     #screenEmulator{
 
     }
 
     .PointScreen {
-
         height: @(Model.Point.Height+"px");
         width: @(Model.Point.Width+"px");
         transform-origin: 0 0;
-        transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture));
-
-        border: 2px solid;
-        padding-left: 5%; padding-right: 5%; /*need to think about*/
+        transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) );
+        border: 3px solid;
+        /*padding-left: 5%; padding-right: 5%;*/ /*need to think about*/
         white-space: normal;
         overflow: hidden;
         /*white-space: nowrap;*/
+        background-color: @Model.BackgroundColor;
+        background-position: left top;
+        background-repeat: no-repeat;
+        /*object-fit: none;*/
     }
     p {line-height: 1; margin-bottom: 0; margin-top: 0;}
 
     .wrap {
-        height: 100px;
-        width: 100px;
-        @*height: @((Model.Point.Height* Model.Point.Scale) -280 +"px");*@
-        border: dotted 3px;
+        /*height: 100px;
+        width: 100px;*/
+
+
+        @*@{
+            var height = Math.Ceiling (Model.Point.Height * Model.Point.Scale);
+            var width = Math.Ceiling (Model.Point.Width * Model.Point.Scale);
+        }*@
+        @*height: @((Model.Point.Height* Model.Point.Scale +6) +"px");
+        width: @((Model.Point.Width* Model.Point.Scale +6) +"px");*@
+        height: @(Math.Ceiling(Model.Point.Height * Model.Point.Scale) + 6+ "px");
+        width: @(Math.Ceiling(Model.Point.Width * Model.Point.Scale) + 5+"px");
+        /*border: dotted 3px;*/
+        overflow: hidden;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .center {
@@ -34,6 +51,24 @@
     .hide-scrollbar {
         overflow: -moz-hidden-unscrollable;
         overflow: hidden;
+    }
+
+    .border-line {
+        border-right: 3px solid #000;
+    }
+
+    /* remove top and bottom padding */
+    .note-color .dropdown-menu {
+        min-width: 168px !important;
+        padding: 0;
+    }
+     /*hide background color picker */
+    .note-color .note-palette:first-child {
+        display: none !important;
+    }
+    /* remove palette title */
+    .note-color .note-palette-title {
+        display: none;
     }
 
     /*.wrap:hover {
@@ -52,6 +87,7 @@
     /*}*/
 </style>
 
+
 @section Scripts {
 
     @*summernote*@
@@ -63,9 +99,9 @@
         <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>*@
 
     @*<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>*@
-    
-    <link href="~/lib/summernote-0.8.18-dist/summernote-bs4.min.css" rel="stylesheet">    
+        <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>*@
+
+    <link href="~/lib/summernote-0.8.18-dist/summernote-bs4.min.css" rel="stylesheet">
     <script src="~/lib/summernote-0.8.18-dist//summernote-bs4.min.js"></script>
     <script src="~/lib/summernote-0.8.18-dist/lang/summernote-ru-RU.js"></script>
 
@@ -79,20 +115,23 @@
     @*<script>tinymce.init({ selector: 'textarea' });</script>*@
     @*<script>tinymce.init({ selector: "#Text" });</script>*@
     @*TinyMce*@
+
+
+
     <script>
-        $(function () {            
+        $(function () {
+
             $('#Text').summernote({
+                @*'backColor', '@Model.BackgroundColor',*@
+                //'backColor': 'red',
                 lang: 'ru-RU',
                 callbacks: {
                     onKeyup: function (e) {
-                        
                         $('#screenEmulator').html($(this).val());
-                        
                     }
                     ,
                     onPaste: function (e) {
                         $('#screenEmulator').html($(this).val());
-                        
                     }
                     ,
                     onBlur: function (e) {
@@ -102,18 +141,13 @@
                 }
                 ,
                 toolbar: [
-                    //['style', ['style']],
-                    //['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
                     ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
                     ['fontname', ['fontname']],
-                    //['fontsize', ['fontsize']],
                     ['color', ['color']],
-                    ['para', ['ol', 'ul', 'paragraph', 'height']],
-                    //['table', ['table']]
+                    ['para', ['paragraph', 'height']]
                 ]
             });
-
-            
+                       
 
             $("#Text").on("summernote.mouseup", function (e, mouseEvent) {
                 console.log("mouseup");
@@ -128,33 +162,36 @@
             $('#form').show();
             $('#loadMsg').hide();
 
-            //$('#Text').on('keyup', function () {
+            $("input[name$='AdvertisementType']").click(function () {
+                var test = $(this).val();
+                $("#partText").hide();
+                $("#partPhoto").hide();
+                $("#partVideo").hide();
+                $("#part" + test).removeClass("d-none").show();
+            });
 
-            //    //$('#screenEmulator').text($(this).val());
-
-            //    setTimeout(function () {
-            //        $('#screenEmulator').text($(this).val());
-            //    }, 200);
-
-
-            //});
-            //$("textarea[id$=Text]").change(function () {
-            //    alert('test');
-            //    $('div[id$=screenEmulator]').text($(this).val());
-            //});
-
+            $("#sendToModerate").click(function () {
+                if (confirm("После отправки на модерацию вы не сможете изменить объявление! Вы уверены что хотите отправить объявление на проверку?")) {
+                    $('#forModeration').val(true);
+                    alert($('#forModeration').val());
+                    $('#form').FormSubmit();
+                }
+                else {
+                    return false;
+                }
+            });
         });
     </script>
-
-
 }
 
-@model Dal.Models.Advertisement
+
 
 @{
     ViewData["Title"] = "Изменить объявление";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+
 <div class="row">
     <h4 class="col-md-4">@ViewData["Title"]</h4>
     <h4 class="col-md-6"><a asp-action="Index">Мои объявления</a></h4>
@@ -164,61 +201,14 @@
     Загрузка, подождите пожалуйста...
 </div>
 <hr />
-<div id="form" class="row" style="border: 1px solid; display:none;">
-    <div class="col-md-6" style="border: 1px dotted;">
-        <form asp-action="Edit">
+
+<div id="form" class="row" style="border: 1px solid; display: none;">
+    <div class="col-md-12" style="border: 1px dotted;">
+        <form asp-action="Edit" id="EditForm" enctype="multipart/form-data" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" id="forModeration" name="forModeration" value=false />
 
-            <div class="form-group">
-
-                @switch (Model.AdvertisementStatus.Name)
-                {
-                    case ("InModeration"):
-                        <div class="text-warning text-center">Ваше объявление проверяется. Вы не можете его изменить</div>
-                        break;
-
-                    case ("ForPayment"):
-                        <div class="text-warning text-center">Ожидается оплата за объявление. Вы не можете его изменить</div>
-                        break;
-
-                    case ("Active"):
-                        <div class="text-warning text-center">Ваше объявление в эфире. Вы не можете его изменить</div>
-                        break;
-
-                    case ("Waiting"):
-                        <div class="text-warning text-center">Ваше объявление в очереди. Вы не можете его изменить</div>
-                        break;
-                }
-
-
-                @*@if (Model.AdvertisementStatus.Name == "Created" || Model.AdvertisementStatus.Name == "Finished")
-                {
-                    <div class="text-warning text-center">Ваше объявление проверяется. Вы не можете его изменить</div>
-                }*@
-                <div class="text-center">
-                    <label asp-for="Text" class="control-label"></label>
-                </div>
-
-                @*<input asp-for="Text" class="form-control" type="text" />*@
-
-                <textarea asp-for="Text" rows="6" class="form-control"></textarea>
-                <span asp-validation-for="Text" class="text-danger"></span>
-            </div>
-            <div class="form-group text-center">
-                @if (Model.AdvertisementStatus.Name == "Created" || Model.AdvertisementStatus.Name == "Finished")
-                {
-                    <input type="submit" value="Сохранить" class="btn btn-primary" />
-                    <a asp-controller="Advertisements"
-                       asp-action="SendToModeration"
-                       asp-route-id=@Model.Id
-                       class="btn btn-primary"
-                       onclick="return confirm('После отправки на модерацию вы не сможете изменить объявление! Вы уверены что хотите отправить объявление на проверку? ')"
-                       >Отправить на проверку</a>
-                }
-
-            </div>
-            
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
@@ -226,43 +216,119 @@
             </div>
 
             <div class="row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-3">
                     <label asp-for="PointId" class="control-label">Место объявления</label>
                     <select asp-for="PointId" class="form-control" asp-items="ViewBag.Points"></select>
                     <span asp-validation-for="PointId" class="text-danger"></span>
                 </div>
 
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-3">
                     <label asp-for="Duration" class="control-label">Длительность в сек</label>
                     <select asp-for="Duration" class="form-control" asp-items="ViewBag.Seconds"></select>
                     <span asp-validation-for="Duration" class="text-danger"></span>
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-3">
                     <label asp-for="DurationInDays" class="control-label">Количество дней</label>
                     <select asp-for="DurationInDays" class="form-control" asp-items="ViewBag.Days"></select>
                     <span asp-validation-for="DurationInDays" class="text-danger"></span>
                 </div>
-
-                <div class="form-group col-md-6">
-                    <label asp-for="FontSize" class="control-label"></label>
-                    <input asp-for="FontSize" class="form-control" />
-                    <span asp-validation-for="FontSize" class="text-danger"></span>
-                </div>
-
-                <div class="form-group col-md-6">
+            </div>
+            <div class="row">
+                <div class="form-group col-md-3">
                     <label asp-for="AdNumber" class="control-label"></label>
                     <input asp-for="AdNumber" class="form-control" disabled="disabled" />
                     <span asp-validation-for="AdNumber" class="text-danger"></span>
                 </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="Price" class="control-label"></label>
+                    <input asp-for="Price" class="form-control" disabled="disabled" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="text-center">
+
+
+
+                <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Text) ? "checked" : "") value=@Dal.Models.AdvertisementType.Text name="AdvertisementType" autocomplete="off" id="radioText" /><label for="radioText">Текст</label>
+                <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Photo) ? "checked" : "") value=@Dal.Models.AdvertisementType.Photo name="AdvertisementType" autocomplete="off" id="radioPhoto" /><label for="radioPhoto">Изображение</label>
+                <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Video) ? "checked" : "") value=@Dal.Models.AdvertisementType.Video name="AdvertisementType" autocomplete="off" id="radioVideo" /><label for="radioVideo">Видео</label>
+            </div>
+
+            <div class="form-group text-center">
+                @if (Model.AdvertisementStatus.Name == "Created" || Model.AdvertisementStatus.Name == "Finished")
+                {
+                    <input type="submit" value="Сохранить" class="btn btn-primary left" />
+                    <a asp-controller="Advertisements"
+                       asp-action="SendToModeration"
+                       asp-route-id=@Model.Id
+                       class="btn btn-primary right"
+                       onclick="return confirm('После отправки на модерацию вы не сможете изменить объявление! Вы уверены что хотите отправить объявление на проверку? ')">Отправить на проверку</a>
+
+
+                }
+                else if(Model.AdvertisementStatus.Name == "ForPayment")
+                {
+                    <a asp-controller="Advertisements"
+                       asp-action="SendToEdit"
+                       asp-route-id=@Model.Id
+                       class="btn btn-primary"
+                       onclick="return confirm('После редактирования вам снова нужно будет отправлять объявление на модерацию! Согласны?')">Редактировать объявление</a>
+                }
+            </div>
+
+            <div id="part@(Dal.Models.AdvertisementType.Text)" @((Model.AdvertisementType != AdvertisementType.Text) ? "class=d-none" : "")>
+                <div class="form-group row">
+                    <div class="col-md-6 border-line">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label asp-for="BackgroundColor" class="control-label"></label>
+                                <input asp-for="BackgroundColor" class="form-control" type="color" />
+                                <span asp-validation-for="BackgroundColor" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="FontSize" class="control-label"></label>
+                                <input asp-for="FontSize" class="form-control" />
+                                <span asp-validation-for="FontSize" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="text-center">                             
+                            <label asp-for="Text" class="control-label">Введите сюда текст объявления</label>
+                        </div>
+
+                        @*<input asp-for="Text" class="form-control" type="text" />*@
+
+                        <textarea asp-for="Text" rows="6" class="form-control"></textarea>
+                        <span asp-validation-for="Text" class="text-danger"></span>
+                        
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-center text-info">Так будет выглядеть текст на экране</div>
+                        <div class="wrap">
+                            <div class="PointScreen" style="font-size: @(Model.FontSize+"px");" id="screenEmulator">
+                                @Html.Raw(Model.Text)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="part@(Dal.Models.AdvertisementType.Photo)" @((Model.AdvertisementType != AdvertisementType.Photo) ? "class=d-none" : "")>
+                <h3 class="text-center text-danger">@TempData["PhotoMessage"]</h3>
+                @*<input type="file" name="uploadedFile" />*@
+
+
+                <input type="file" id="uploadedFile" name="uploadedFile" style="display: none">
+                <label for="uploadedFile" class="btn btn-primary  btn-outlined">Выберите изображение</label>
+                <div>
+                    <div class="wrap">
+                        <img id="image" src=@Model.ImagePath width="@(Math.Ceiling(Model.Point.Width*Model.Point.Scale))" height="@(Math.Ceiling(Model.Point.Height*Model.Point.Scale))" class="PointScreen" />
+                    </div>
+                </div>
+                
+            </div>
+            <div id="part@(Dal.Models.AdvertisementType.Video)" @((Model.AdvertisementType != AdvertisementType.Video) ? "class=d-none" : "")>
+                
             </div>
         </form>
     </div>
-
-    <div class="col-md-6 wrap">
-        <div class="text-center text-info">Так будет выглядеть текст на экране</div>
-        <div class="PointScreen" style="font-size: @(Model.FontSize+"px");" id="screenEmulator">
-            @Html.Raw(Model.Text)
-        </div>
-    </div>    
 </div>
-

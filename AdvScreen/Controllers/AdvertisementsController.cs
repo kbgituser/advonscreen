@@ -56,8 +56,17 @@ namespace AdvScreen.Controllers
             ViewData["advertisementStatuses"] = new SelectList(_context.AdvertisementStatuses, "Id", "NameRu");
             
             ApplicationUser CurrentUser = GetCurrentUser();
+            
             //var advertisements = _context.Advertisements.AsQueryable();
             var advertisements = _context.Advertisements.AsQueryable();
+
+            ///////
+            //advertisements = null;
+            //var test = advertisements.First();
+            //var test2 = test.AdNumber;
+            ///////
+            
+
             AdvertisementStatus curStatus;
             int curPointId, curPrice;
             if (!string.IsNullOrEmpty(adNumber))
@@ -119,11 +128,11 @@ namespace AdvScreen.Controllers
                     break;
             }
 
-            int pageSize = 3;            
+            int pageSize = 10;
             int pN = p ?? 1;
             
             ViewBag.PageNo = pN;
-            ViewBag.PageSize = 3;
+            ViewBag.PageSize = pageSize;
             ViewBag.TotalRecords = advertisements.Count();
 
             if (await _userManager.IsInRoleAsync(CurrentUser, "Admin"))
@@ -418,7 +427,19 @@ namespace AdvScreen.Controllers
             {
                 try
                 {
-                    var curAdv = _context.Advertisements.FirstOrDefault(a => a.Id == id);                    
+                    var curAdv = _context.Advertisements.FirstOrDefault(a => a.Id == id);
+
+                    ApplicationUser CurrentUser = GetCurrentUser();
+                    if (!await _userManager.IsInRoleAsync(CurrentUser, "Admin")
+                        && !(curAdv.AdvertisementStatus.Name == AdvertisementStatusEnum.Created.ToString()
+                        || curAdv.AdvertisementStatus.Name == AdvertisementStatusEnum.Finished.ToString()
+                        )
+                        )
+                    {
+                        TempData["Message"] = "Можно сохранять объявления только со статусом Активный и Завершенный";
+                        return RedirectToAction("ErrorHandle", "Home");
+                    }
+
                     curAdv.PointId = advertisement.PointId;
                     curAdv.Title = advertisement.Title;
                     curAdv.Text = advertisement.Text;
@@ -429,7 +450,11 @@ namespace AdvScreen.Controllers
                     curAdv.AdNumber = GenerateAdvertisementNumber(curAdv);
                     curAdv.BackgroundColor = advertisement.BackgroundColor;
                     curAdv.AdvertisementType = advertisement.AdvertisementType;
-                    curAdv.Video = advertisement.Video;
+                    if (await _userManager.IsInRoleAsync(CurrentUser, "Admin"))
+                        {
+                        curAdv.Video = advertisement.Video;
+                    }
+                    
                     _context.Update(curAdv);
 
 
@@ -444,9 +469,15 @@ namespace AdvScreen.Controllers
 
                         if (isValid)
                         {
-                            string fileExtension = System.IO.Path.GetExtension(uploadedFile.FileName);
+                            string fileExtension = DateTime.Now.Ticks + System.IO.Path.GetExtension(uploadedFile.FileName);
                             //string path = _env.ContentRootPath + "/Files/Images/" + curAdv.AdNumber + fileExtension;
-                            string path = _env.WebRootPath + "/Files/Images/" + curAdv.AdNumber + fileExtension;
+                            string path = _env.WebRootPath + "/Files/Images/" + curAdv.AdNumber  + fileExtension;
+                            string curFilePath = _env.WebRootPath + curAdv.ImagePath;
+                            if (System.IO.File.Exists(curFilePath))
+                            {
+                                System.IO.File.Delete(curFilePath);
+                            }
+
                             // сохраняем файл в папку Files в каталоге wwwroot
                             using (var fileStream = new FileStream(path, FileMode.Create))
                             {

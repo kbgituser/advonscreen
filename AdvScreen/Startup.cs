@@ -15,6 +15,9 @@ using Microsoft.Extensions.Hosting;
 using Dal.Models;
 using Dal.Data;
 using Microsoft.AspNetCore.StaticFiles;
+using AdvScreen.Models;
+using AdvScreen.Areas.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace AdvScreen
 {
@@ -56,9 +59,22 @@ namespace AdvScreen
               //.AddDefaultIdentity<ApplicationUser>()
               .AddIdentity<ApplicationUser, IdentityRole>() //(options => options.SignIn.RequireConfirmedAccount = true) 
               .AddEntityFrameworkStores<ApplicationDbContext>()
+              .AddErrorDescriber<RussianIdentityErrorDescriber>()
+              .AddDefaultUI()
               //.AddUserManager<UserManager<ApplicationUser>>()
               //.AddRoleManager<RoleManager<IdentityRole>>()
+              .AddDefaultTokenProviders()
               ;
+
+            services.AddTransient<IEmailSender, EmailSender>(i =>
+                new EmailSender(
+                    Configuration["EmailSender:Host"],
+                    Configuration.GetValue<int>("EmailSender:Port"),
+                    Configuration.GetValue<bool>("EmailSender:EnableSSL"),
+                    Configuration["EmailSender:UserName"],
+                    Configuration["EmailSender:Password"]
+                )
+            );
 
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -79,11 +95,13 @@ namespace AdvScreen
                 options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.AllowedForNewUsers = true;
 
-
+                
                 // User settings.
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedEmail = true;
+                options.SignIn.RequireConfirmedAccount = true;
             });
 
             services.ConfigureApplicationCookie(options =>
@@ -96,6 +114,7 @@ namespace AdvScreen
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
                 options.SlidingExpiration = true;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(20);      // 20 minutes logged in session timeout
+
             });
 
             //services.PostConfigure<Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme,
@@ -118,6 +137,7 @@ namespace AdvScreen
         {
             if (env.IsDevelopment())
             {
+                // чтобы не выходило сообщение, обработка ошибок в браузере
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 DbInitializer.Initialize(app);

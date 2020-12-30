@@ -41,7 +41,14 @@
     </div>
     <input type="submit" value="Поиск" class="btn btn-success" />
 </form>
-
+<br />
+<paging total-records="@ViewBag.TotalRecords"
+        page-no="@ViewBag.PageNo"
+        page-size="@ViewBag.PageSize"
+        show-total-pages="false"
+        show-total-records="false"
+        show-page-size-nav="false">
+</paging>
 <table class="table">
     <thead>
         <tr>
@@ -150,13 +157,12 @@
     </tbody>
 </table>
 
-<div class="text-center center align-content-center">
-    <paging total-records="@ViewBag.TotalRecords"
-            page-no="@ViewBag.PageNo"
-            page-size="@ViewBag.PageSize"
-            show-total-pages="false"
-            show-total-records="false"
-            show-page-size-nav="false"
-            >
-    </paging>
-</div>
+
+<paging total-records="@ViewBag.TotalRecords"
+        page-no="@ViewBag.PageNo"
+        page-size="@ViewBag.PageSize"
+        show-total-pages="false"
+        show-total-records="false"
+        show-page-size-nav="false">
+</paging>
+

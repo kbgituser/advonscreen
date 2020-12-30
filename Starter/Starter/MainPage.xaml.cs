@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Android.Webkit;
+using Newtonsoft.Json;
 using Starter.Models;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,10 @@ namespace Starter
         public int PointId = 2;
         public Cycle cycle;
         public bool Connected { get; set; }
+        //string baseUri = "https://adv.kenseler.kz";
+        string baseUri = "https://192.168.0.107:45455";
+        //string baseUri = "https://10.0.2.2:45455";
+
 
         public MainPage()
         {
@@ -41,8 +46,15 @@ namespace Starter
             base.OnAppearing();
             Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
             Connected = Connectivity.NetworkAccess == NetworkAccess.Internet;
-            string uri = "https://adv.kenseler.kz/adsapi/";            
-            
+
+            //uri = "https://adv.kenseler.kz/adsapi/";
+
+            string uri = baseUri+ "/adsapi/";
+            //uri = "https://192.168.0.106:45455/adsapi/";
+            //uri = "https://adv.kenseler.kz/adsapi/";
+
+            //uri = "https://10.0.2.2:44379/adsapi/";
+
             cycle = new Cycle(PointId, uri);
             cycle.onAdvChange += RefreshText;
             cycle.Init();
@@ -71,9 +83,26 @@ namespace Starter
                 // UI interaction here
                 try
                 {
+
+                    string uri = "https://192.168.0.105:45455/adsapi/";
+                    string imgUri = "https://192.168.0.106:45455";
+
+                    //CookieManager.Instance.RemoveAllCookie();
                     var html = "";
                     html += "<style>";
                     html += "html, body {margin:0px;padding:0px;}";
+
+                    html += ".PointImage {";
+                    html += "background-position: center center; ";
+                    html += "max-width: 100%; max-height: 100vh; min-height: 100vh; min-width: 100%;";
+                    html += "background-repeat: no-repeat; ";
+                    html += "object-fit: contain; ";
+                    
+                    html += "vertical-align: middle";
+                    
+
+                    html += "}";
+
                     html += ".PointScreen {" +
 
                     //"height: 100vh;" +
@@ -88,11 +117,11 @@ namespace Starter
                     "overflow: -moz-hidden-unscrollable;" +
                     "overflow: hidden;" +
                     "transform-origin: 0 0;" +
-                    "border: 2px solid;" +
+                    //"border: 2px solid;" +
                     "white-space: normal;" +
                     //"line-height: 0.8;" +                    
                     //"line-height: 1;" +                    
-                    "background-color: red;"+
+                    "background-color: " + cycle.CurrentAdvertisement.BackgroundColor +";"+
 
                     //"background-image: linear-gradient(to bottom,rgba(240, 255, 40, 1) 0%,"+
                     //    "rgba(240, 255, 40, 1) 100%),linear - gradient(to bottom,rgba(240, 40, 40, 1) 0%,rgba(240, 40, 40, 1) 100%);"+
@@ -104,12 +133,30 @@ namespace Starter
                     ;
 
                     html += "</style>";
-                    html += "<div class='PointScreen'>";
-                    //html += "Ширина - "+webView.Width + "; Высота - " + webView.Height+";";
-
-                    html += cycle.CurrentAdvertisement.Text;
-                    html += "</div>";
                     
+                    //html += "Ширина - "+webView.Width + "; Высота - " + webView.Height+";";
+                    if (cycle.CurrentAdvertisement.AdvertisementType == AdvertisementType.Text)
+                    {
+                        html += "<div class='PointScreen'>";
+                        html += cycle.CurrentAdvertisement.Text;
+                        html += "</div>";
+                    }
+                    else if (cycle.CurrentAdvertisement.AdvertisementType == AdvertisementType.Photo)
+                    {
+                        //html += "<div class='PointImage'>";
+                        html += "<img src=\""+ baseUri
+                        + cycle.CurrentAdvertisement.ImagePath 
+                        + "\" " +
+                        "class='PointImage' " +
+                        "/>";
+                        //html += "</div>";
+                    }
+                    else if (cycle.CurrentAdvertisement.AdvertisementType == AdvertisementType.Video)
+                    {
+                        html += cycle.CurrentAdvertisement.Video ;
+                    }
+
+
 
                     viewSource.Html = html;                    
                     webView.Source = viewSource;

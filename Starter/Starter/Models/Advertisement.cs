@@ -39,6 +39,10 @@ namespace Starter.Models
         public virtual Point Point { get; set; }
         public int AdvertisementStatusId { get; set; }
         public virtual AdvertisementStatus AdvertisementStatus { get; set; }
+        public AdvertisementType AdvertisementType { get; set; }
+        public string ImagePath { get; set; }
+        public string Video { get; set; }
+        public string BackgroundColor { get; set; } = "#FFFFFF";
         public virtual ICollection<AdvertisementStatusHistory> AdvertisementStatusHistories { get; set; }
         public AdvertisementStatus GetAdvertisementStatus()
         {

@@ -48,7 +48,9 @@ namespace AdvScreen.Controllers
         public async Task<ActionResult<Advertisement>> GetAdvertisement(int pointId, int? curAdId)
         {
             var advs = _context.Advertisements.Where(a => a.PointId == pointId && a.AdvertisementStatus.Name == "Active")
-                .Include(a => a.ApplicationUser).Include(a => a.Point).Include(a => a.AdvertisementStatus)
+                //.Include(a => a.ApplicationUser)
+                .Include(a => a.Point)
+                .Include(a => a.AdvertisementStatus)
                 .OrderBy(a => a.StartDate)
                 ;
             Advertisement advertisement;

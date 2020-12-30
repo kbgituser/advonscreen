@@ -20,4 +20,14 @@ namespace Starter.Models
         [Description("Завершенный")]
         Finished
     }
+
+    public enum AdvertisementType
+    {
+        [Description("Текст")]
+        Text = 0,
+        [Description("Фотография")]
+        Photo = 1,
+        [Description("Видео")]
+        Video = 2
+    }
 }

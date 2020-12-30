@@ -112,6 +112,7 @@ namespace AdvScreen.Controllers
                 ,
                 Name = user.Name
                 , Blocked = user.Blocked
+                , EmailConfirmed = user.EmailConfirmed
             };
             return View(model);
         }
@@ -127,7 +128,7 @@ namespace AdvScreen.Controllers
                     //user.Email = model.Email;
                     user.Name = model.Name;
                     user.Blocked = model.Blocked;
-
+                    user.EmailConfirmed = model.EmailConfirmed;
                     var result = await _userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {

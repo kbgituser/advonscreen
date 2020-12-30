@@ -1,13 +1,13 @@
 ﻿@model Dal.Models.Advertisement
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Новое объявление";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
+<h1>@ViewData["Title"]</h1>
 
-<h4>Advertisement</h4>
+
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -17,11 +17,11 @@
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            @*<div class="form-group">
                 <label asp-for="Text" class="control-label"></label>
                 <input asp-for="Text" class="form-control" />
                 <span asp-validation-for="Text" class="text-danger"></span>
-            </div>
+            </div>*@
             <div class="form-group">
                 <label asp-for="PointId" class="control-label"></label>
 
@@ -54,15 +54,12 @@
                         <input class="btn btn-info" type="radio" checked value=@Dal.Models.AdvertisementType.Text name="AdvertisementType" autocomplete="off" />Текст
                     </label>
                     <label class="btn btn-secondary">
-                        <input class="btn btn-info" type="radio" value=@Dal.Models.AdvertisementType.Photo name="AdvertisementType" autocomplete="off" />Фото
+                        <input class="btn btn-info" type="radio" value=@Dal.Models.AdvertisementType.Photo name="AdvertisementType" autocomplete="off" />Изображение
                     </label>
                     <label class="btn btn-secondary">
                         <input class="btn btn-info" type="radio" value=@Dal.Models.AdvertisementType.Video name="AdvertisementType" autocomplete="off" />Видео
                     </label>
                  </div>
-
-
-
                     <span asp-validation-for="AdvertisementType" class="text-danger"></span>
                 </div>
 
@@ -71,13 +68,11 @@
 
 
                 <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary" />
+                    <input type="submit" value="Создать" class="btn btn-primary" />
                 </div>
 </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 

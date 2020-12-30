@@ -31,7 +31,7 @@ namespace AdvScreen.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "Поле Email обязательно для заполнения")]
             [EmailAddress]
             public string Email { get; set; }
         }
@@ -59,8 +59,8 @@ namespace AdvScreen.Areas.Identity.Pages.Account
 
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "Сброс пароля",
+                    $"Сбросьте ваш пароль <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>нажав здесь</a>.");
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }

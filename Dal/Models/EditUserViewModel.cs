@@ -15,5 +15,7 @@ namespace Dal.Models
         public string Name { get; set; }
         [Display(Name = "Блокированный")]
         public bool Blocked { get; set; }
+        [Display(Name = "Подтвержденный")]
+        public bool EmailConfirmed { get; set; }
     }
 }

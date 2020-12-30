@@ -1,4 +1,8 @@
-﻿<style>
+﻿@model Dal.Models.Advertisement
+@using Dal.Models
+
+
+<style>
     #screenEmulator{
 
     }
@@ -7,15 +11,37 @@
         height: @(Model.Point.Height+"px");
         width: @(Model.Point.Width+"px");
         transform-origin: 0 0;
-        transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture));
-        border: 2px solid;
+        transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) );
+        border: 3px solid;
         /*padding-left: 5%; padding-right: 5%;*/ /*need to think about*/
         white-space: normal;
         overflow: hidden;
-
         /*white-space: nowrap;*/
         background-color: @Model.BackgroundColor;
+        background-position: left top;
+        background-repeat: no-repeat;
+        /*object-fit: none;*/
+
+        /*проба*/
+        
     }
+
+    .PointImage {
+        height: @(Model.Point.Height+"px");
+        width: @(Model.Point.Width+"px");
+        transform-origin: 0 0;
+        transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) );
+        border: 6px solid;
+        /*padding-left: 5%; padding-right: 5%;*/ /*need to think about*/
+        white-space: normal;
+        overflow: hidden;
+        /*white-space: nowrap;*/
+
+        background-position: center center;
+        background-repeat: no-repeat;
+        object-fit: contain;
+    }
+
     p {line-height: 1; margin-bottom: 0; margin-top: 0;}
 
     .wrap {
@@ -31,7 +57,7 @@
         width: @((Model.Point.Width* Model.Point.Scale +6) +"px");*@
         height: @(Math.Ceiling(Model.Point.Height * Model.Point.Scale) + 6+ "px");
         width: @(Math.Ceiling(Model.Point.Width * Model.Point.Scale) + 5+"px");
-        border: dotted 3px;
+        /*border: dotted 3px;*/
         overflow: hidden;
         margin-left: auto;
         margin-right: auto;
@@ -64,6 +90,11 @@
     .note-color .note-palette-title {
         display: none;
     }
+
+    .note-editing-area {
+        background-color: @Model.BackgroundColor;
+    }
+    
     /*.wrap:hover {
         height: 300px;
         width: 260px;
@@ -79,6 +110,7 @@
         /* more transform-origin */
     /*}*/
 </style>
+
 
 @section Scripts {
 
@@ -108,15 +140,15 @@
     @*<script>tinymce.init({ selector: "#Text" });</script>*@
     @*TinyMce*@
 
-    
+
 
     <script>
         $(function () {
 
             $('#Text').summernote({
-                @*'backColor', '@Model.BackgroundColor',*@
-                //'backColor': 'red',
+                
                 lang: 'ru-RU',
+                maximumImageFileSize: 1024 * 1024, // 500 KB
                 callbacks: {
                     onKeyup: function (e) {
                         $('#screenEmulator').html($(this).val());
@@ -126,29 +158,34 @@
                         $('#screenEmulator').html($(this).val());
                     }
                     ,
-                    onBlur: function (e) {
-                        console.log("blur");
+                    onBlur: function (e) {                        
                         $('#screenEmulator').html($(this).val());
+                    }
+                    ,
+                    onImageUploadError: function (msg) {
+                        console.log(msg + ' (1 MB)');
+                        alert("Изображение должно быть в пределах 1 Мб");
                     }
                 }
                 ,
-                toolbar: [                    
+                toolbar: [
                     ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
-                    ['fontname', ['fontname']],                    
-                    ['color', ['color']],                    
+                    ['fontname', ['fontname']],
+                    ['color', ['color']],
+                    ['table', ['table']],
+                    ['insert', ['picture']],
                     ['para', ['paragraph', 'height']]
                 ]
             });
 
-            $('#Text').summernote('backColor', 'red');
+            var fontBackColor = $('button.note-btn.btn.btn-light.btn-sm.note-current-color-button');
+            fontBackColor.attr("data-backcolor", "#1C00ff00");
 
-            $("#Text").on("summernote.mouseup", function (e, mouseEvent) {
-                console.log("mouseup");
+            $("#Text").on("summernote.mouseup", function (e, mouseEvent) {                
                 $('#screenEmulator').html($(this).val());
             })
 
-            $('#Text').on('summernote.focus', function () {
-                console.log('Editable area is focused');
+            $('#Text').on('summernote.focus', function () {                
                 $('#screenEmulator').html($(this).val());
             });
 
@@ -169,24 +206,21 @@
                     alert($('#forModeration').val());
                     $('#form').FormSubmit();
                 }
-                else {                    
+                else {
                     return false;
                 }
             });
         });
-        
     </script>
-
-
 }
 
-@model Dal.Models.Advertisement
-@using Dal.Models
+
 
 @{
     ViewData["Title"] = "Изменить объявление";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 
 <div class="row">
     <h4 class="col-md-4">@ViewData["Title"]</h4>
@@ -197,20 +231,6 @@
     Загрузка, подождите пожалуйста...
 </div>
 <hr />
-
-@*<div class="btn-group btn-group-toggle" data-toggle="buttons">
-        <label class="btn btn-secondary active">
-            <input class="btn btn-info" type="radio" checked value=@Dal.Models.AdvertisementType.Text name="AdvertisementType" autocomplete="off" />Текст
-        </label>
-        <label class="btn btn-secondary">
-            <input class="btn btn-info" type="radio" value=@Dal.Models.AdvertisementType.Photo name="AdvertisementType" autocomplete="off" />Фото
-        </label>
-        <label class="btn btn-secondary">
-            <input class="btn btn-info" type="radio" value=@Dal.Models.AdvertisementType.Video name="AdvertisementType" autocomplete="off" />Видео
-        </label>
-    </div>*@
-
-
 
 <div id="form" class="row" style="border: 1px solid; display: none;">
     <div class="col-md-12" style="border: 1px dotted;">
@@ -242,7 +262,8 @@
                     <select asp-for="DurationInDays" class="form-control" asp-items="ViewBag.Days"></select>
                     <span asp-validation-for="DurationInDays" class="text-danger"></span>
                 </div>
-                
+            </div>
+            <div class="row">
                 <div class="form-group col-md-3">
                     <label asp-for="AdNumber" class="control-label"></label>
                     <input asp-for="AdNumber" class="form-control" disabled="disabled" />
@@ -254,28 +275,29 @@
                     <span asp-validation-for="Price" class="text-danger"></span>
                 </div>
             </div>
+
             <div class="text-center">
 
-                
 
-                <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Text)? "checked":"") value=@Dal.Models.AdvertisementType.Text name="AdvertisementType" autocomplete="off" id="radioText"/><label for="radioText">Текст</label>
-                <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Photo)? "checked":"") value=@Dal.Models.AdvertisementType.Photo name="AdvertisementType" autocomplete="off" id="radioPhoto"/><label for="radioPhoto">Изображение</label>
-                <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Video)? "checked":"") value=@Dal.Models.AdvertisementType.Video name="AdvertisementType" autocomplete="off" id="radioVideo"/><label for="radioVideo">Видео</label>
+
+                <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Text) ? "checked" : "") value=@Dal.Models.AdvertisementType.Text name="AdvertisementType" autocomplete="off" id="radioText" /><label for="radioText">Текст</label>
+                <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Photo) ? "checked" : "") value=@Dal.Models.AdvertisementType.Photo name="AdvertisementType" autocomplete="off" id="radioPhoto" /><label for="radioPhoto">Изображение</label>
+                <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Video) ? "checked" : "") value=@Dal.Models.AdvertisementType.Video name="AdvertisementType" autocomplete="off" id="radioVideo" /><label for="radioVideo">Видео</label>
             </div>
-            
+
             <div class="form-group text-center">
                 @if (Model.AdvertisementStatus.Name.Contains("Created") || Model.AdvertisementStatus.Name.Contains("Finished"))
                 {
                     @*<a asp-controller="Advertisements"
-                       asp-action="SendToModeration"
-                       asp-route-id=@Model.Id
-                       class="btn btn-primary"                       
-                       >Отправить на модерацию</a>*@
+                        asp-action="SendToModeration"
+                        asp-route-id=@Model.Id
+                        class="btn btn-primary"
+                        >Отправить на модерацию</a>*@
 
                     <button id="sendToModerate" class="btn btn-primary">
                         Отправить на модерацию
                     </button>
-                       
+
                     //onclick = "return confirm('После отправки на модерацию вы не сможете изменить объявление! Вы уверены что хотите отправить объявление на проверку? ')"
                 }
                 @if (Model.AdvertisementStatus.Name.Contains("ForPayment"))
@@ -294,9 +316,7 @@
                 }
             </div>
 
-            <div id="part@(Dal.Models.AdvertisementType.Text)" @((Model.AdvertisementType!=AdvertisementType.Text) ? "class=d-none" :"")>
-                
-
+            <div id="part@(Dal.Models.AdvertisementType.Text)" @((Model.AdvertisementType != AdvertisementType.Text) ? "class=d-none" : "")>
                 <div class="form-group row">
                     <div class="col-md-6 border-line">
                         <div class="row">
@@ -329,7 +349,7 @@
                             </div>
                         </div>
                     </div>
-                </div>                
+                </div>
             </div>
             <div id="part@(Dal.Models.AdvertisementType.Photo)" @((Model.AdvertisementType != AdvertisementType.Photo) ? "class=d-none" : "")>
                 <h3 class="text-center text-danger">@TempData["PhotoMessage"]</h3>
@@ -339,18 +359,22 @@
                 <input type="file" id="uploadedFile" name="uploadedFile" style="display: none">
                 <label for="uploadedFile" class="btn btn-primary  btn-outlined">Выберите изображение</label>
                 <div>
-                    <img id="image" src=@Model.ImagePath width="@(Math.Ceiling(Model.Point.Width*Model.Point.Scale))" height="@(Math.Ceiling(Model.Point.Height*Model.Point.Scale))"/>
+                    <div class="text-center text-info">Так будет выглядеть изображение на экране</div>
+                    <div class="wrap">
+                        <img id="image" src=@Model.ImagePath
+                             @*width="@(Math.Ceiling(Model.Point.Width*Model.Point.Scale))" height="@(Math.Ceiling(Model.Point.Height*Model.Point.Scale))"*@
+                             class="PointImage" />
+                    </div>
                 </div>
                 <input type="submit" value="Сохранить" class="btn btn-primary" @*onclick="return FormSubmit();"*@ />
             </div>
-            <div id="part@(Dal.Models.AdvertisementType.Video)" @((Model.AdvertisementType!=AdvertisementType.Video)? "class=d-none":"")>
+            <div id="part@(Dal.Models.AdvertisementType.Video)" @((Model.AdvertisementType != AdvertisementType.Video) ? "class=d-none" : "")>
                 <div class="form-group">
                     <label asp-for="Video" class="control-label"></label>
                     <input asp-for="Video" class="form-control" />
                     <span asp-validation-for="Video" class="text-danger"></span>
                     <input type="submit" value="Сохранить" class="btn btn-primary" @*onclick="return FormSubmit();"*@ />
                 </div>
-                @*<iframe width="560" height="315" src="https://www.youtube.com/embed/-fXQJ5r5Y-o?autoplay=1&mute=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>*@
             </div>
         </form>
     </div>
