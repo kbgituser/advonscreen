@@ -2,7 +2,7 @@
 @using Dal.Models
 
 
-<style>
+<!--<style>
     #screenEmulator{
 
     }
@@ -22,20 +22,35 @@
         background-repeat: no-repeat;
         /*object-fit: none;*/
     }
+
+    .PointImage {
+        height: @(Model.Point.Height+"px");
+        width: @(Model.Point.Width+"px");
+        transform-origin: 0 0;
+        transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) );
+        border: 6px solid;
+        /*padding-left: 5%; padding-right: 5%;*/ /*need to think about*/
+        white-space: normal;
+        overflow: hidden;
+        /*white-space: nowrap;*/
+
+        background-position: center center;
+        background-repeat: no-repeat;
+        object-fit: contain;
+    }
+
     p {line-height: 1; margin-bottom: 0; margin-top: 0;}
 
     .wrap {
         /*height: 100px;
-        width: 100px;*/
-
-
-        @*@{
-            var height = Math.Ceiling (Model.Point.Height * Model.Point.Scale);
-            var width = Math.Ceiling (Model.Point.Width * Model.Point.Scale);
-        }*@
-        @*height: @((Model.Point.Height* Model.Point.Scale +6) +"px");
-        width: @((Model.Point.Width* Model.Point.Scale +6) +"px");*@
-        height: @(Math.Ceiling(Model.Point.Height * Model.Point.Scale) + 6+ "px");
+        width: 100px;*/-->
+@*@{
+        var height = Math.Ceiling (Model.Point.Height * Model.Point.Scale);
+        var width = Math.Ceiling (Model.Point.Width * Model.Point.Scale);
+    }*@
+@*height: @((Model.Point.Height* Model.Point.Scale +6) +"px");
+    width: @((Model.Point.Width* Model.Point.Scale +6) +"px");*@
+<!--height: @(Math.Ceiling(Model.Point.Height * Model.Point.Scale) + 6+ "px");
         width: @(Math.Ceiling(Model.Point.Width * Model.Point.Scale) + 5+"px");
         /*border: dotted 3px;*/
         overflow: hidden;
@@ -71,6 +86,9 @@
         display: none;
     }
 
+    .note-editing-area {
+        background-color: @Model.BackgroundColor;
+    }
     /*.wrap:hover {
         height: 300px;
         width: 260px;
@@ -85,8 +103,8 @@
         -moz-transform-origin: left top;*/
         /* more transform-origin */
     /*}*/
-</style>
-
+</style>-->
+@Html.Partial("SharedEdit.cshtml")
 
 @section Scripts {
 
@@ -119,6 +137,7 @@
 
 
     <script>
+        
         $(function () {
 
             $('#Text').summernote({
@@ -144,18 +163,19 @@
                     ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
                     ['fontname', ['fontname']],
                     ['color', ['color']],
+                    ['table', ['table']],
                     ['para', ['paragraph', 'height']]
                 ]
             });
-                       
+
+            var fontBackColor = $('button.note-btn.btn.btn-light.btn-sm.note-current-color-button');
+            fontBackColor.attr("data-backcolor", "#1C00ff00");
 
             $("#Text").on("summernote.mouseup", function (e, mouseEvent) {
-                console.log("mouseup");
                 $('#screenEmulator').html($(this).val());
             })
 
             $('#Text').on('summernote.focus', function () {
-                console.log('Editable area is focused');
                 $('#screenEmulator').html($(this).val());
             });
 
@@ -173,7 +193,6 @@
             $("#sendToModerate").click(function () {
                 if (confirm("После отправки на модерацию вы не сможете изменить объявление! Вы уверены что хотите отправить объявление на проверку?")) {
                     $('#forModeration').val(true);
-                    alert($('#forModeration').val());
                     $('#form').FormSubmit();
                 }
                 else {
@@ -245,14 +264,33 @@
                     <span asp-validation-for="Price" class="text-danger"></span>
                 </div>
             </div>
+            <div class="text-center text-info">Ваше объявление будет в эфире @Model.Duration секунд каждые @(Model.Point.CycleSize/60) минут на протяжении @Model.DurationInDays  (дней/дня)</div>
+            <div class="text-center text-info">Если других объявлений не будет в эфире, то ваше объявление будет отображаться постоянно</div>
+            @if (Model.AdvertisementStatus.Name == Dal.Models.AdvertisementStatusEnum.InModeration.ToString())
+            {
+                <div class="text-center text-danger">Ваше объявление проверяется. Редактирование невозможно. Пожалуйста ожидайте!</div>
+            }
+            else if (Model.AdvertisementStatus.Name == Dal.Models.AdvertisementStatusEnum.ForPayment.ToString())
+            {
+                <div class="text-center text-danger">
+                    Ваше объявление одобрено. Сделайте перевод на Kaspi номер 1212 1212 1212 1212!
+                    <br />После перевода отправьте пожалуйста чек оплаты на почту info@kenseler.kz а в письме укажите ссылку (ниже)
+                    <br />@Context.Request.Host@Context.Request.Path
+                </div>
+            }
+            else if (Model.AdvertisementStatus.Name == Dal.Models.AdvertisementStatusEnum.Active.ToString())
+            {
+                <div class="text-center text-danger">
+                    Ваше объявление в эфире c @Model.StartDate.ToString("dd.MM.yyyy HH:mm") - @Model.EndDate.ToString("dd.MM.yyyy HH:mm")
 
+                </div>
+            }
+            
             <div class="text-center">
-
-
 
                 <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Text) ? "checked" : "") value=@Dal.Models.AdvertisementType.Text name="AdvertisementType" autocomplete="off" id="radioText" /><label for="radioText">Текст</label>
                 <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Photo) ? "checked" : "") value=@Dal.Models.AdvertisementType.Photo name="AdvertisementType" autocomplete="off" id="radioPhoto" /><label for="radioPhoto">Изображение</label>
-                <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Video) ? "checked" : "") value=@Dal.Models.AdvertisementType.Video name="AdvertisementType" autocomplete="off" id="radioVideo" /><label for="radioVideo">Видео</label>
+                @*<input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Video) ? "checked" : "") value=@Dal.Models.AdvertisementType.Video name="AdvertisementType" autocomplete="off" id="radioVideo" /><label for="radioVideo">Видео</label>*@
             </div>
 
             <div class="form-group text-center">
@@ -263,11 +301,11 @@
                        asp-action="SendToModeration"
                        asp-route-id=@Model.Id
                        class="btn btn-primary right"
-                       onclick="return confirm('После отправки на модерацию вы не сможете изменить объявление! Вы уверены что хотите отправить объявление на проверку? ')">Отправить на проверку</a>
+                       onclick="return confirm('После отправки на проверку вы не сможете изменить объявление! Вы уверены что хотите отправить объявление на проверку? ')">Отправить на проверку</a>
 
 
                 }
-                else if(Model.AdvertisementStatus.Name == "ForPayment")
+                else if (Model.AdvertisementStatus.Name == "ForPayment")
                 {
                     <a asp-controller="Advertisements"
                        asp-action="SendToEdit"
@@ -292,7 +330,7 @@
                                 <span asp-validation-for="FontSize" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="text-center">                             
+                        <div class="text-center">
                             <label asp-for="Text" class="control-label">Введите сюда текст объявления</label>
                         </div>
 
@@ -300,10 +338,10 @@
 
                         <textarea asp-for="Text" rows="6" class="form-control"></textarea>
                         <span asp-validation-for="Text" class="text-danger"></span>
-                        
+
                     </div>
                     <div class="col-md-6">
-                        <div class="text-center text-info">Так будет выглядеть текст на экране</div>
+                        <div class="text-center text-info" >Так будет выглядеть текст на экране</div>
                         <div class="wrap">
                             <div class="PointScreen" style="font-size: @(Model.FontSize+"px");" id="screenEmulator">
                                 @Html.Raw(Model.Text)
@@ -321,13 +359,13 @@
                 <label for="uploadedFile" class="btn btn-primary  btn-outlined">Выберите изображение</label>
                 <div>
                     <div class="wrap">
-                        <img id="image" src=@Model.ImagePath width="@(Math.Ceiling(Model.Point.Width*Model.Point.Scale))" height="@(Math.Ceiling(Model.Point.Height*Model.Point.Scale))" class="PointScreen" />
+                        <img id="image" src=@Model.ImagePath width="@(Math.Ceiling(Model.Point.Width*Model.Point.Scale))" height="@(Math.Ceiling(Model.Point.Height*Model.Point.Scale))" class="PointImage" />
                     </div>
                 </div>
-                
+
             </div>
             <div id="part@(Dal.Models.AdvertisementType.Video)" @((Model.AdvertisementType != AdvertisementType.Video) ? "class=d-none" : "")>
-                
+
             </div>
         </form>
     </div>

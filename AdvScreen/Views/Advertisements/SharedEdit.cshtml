@@ -1,0 +1,77 @@
+﻿
+<style>
+    #screenEmulator{
+
+    }
+
+    .PointScreen {
+        height: @(Model.Point.Height+"px");
+        width: @(Model.Point.Width+"px");
+        transform-origin: 0 0;
+        transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) );        
+        border: 3px solid;
+        /*padding-left: 5%; padding-right: 5%;*/ /*need to think about*/
+        white-space: normal;
+        overflow: hidden;
+        /*white-space: nowrap;*/
+        background-color: @Model.BackgroundColor;
+    }
+
+    .PointImage {
+        height: @(Model.Point.Height+"px");
+        width: @(Model.Point.Width+"px");
+        transform-origin: 0 0;
+        transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) );
+        border: 6px solid;
+        white-space: normal;
+        overflow: hidden;
+        background-position: center center;
+        background-repeat: no-repeat;
+        object-fit: contain;
+    }
+
+    p {line-height: 1; margin-bottom: 0; margin-top: 0;}
+
+    .wrap {
+        height: @(Math.Ceiling(Model.Point.Height * Model.Point.Scale) + 6+ "px");
+        width: @(Math.Ceiling(Model.Point.Width * Model.Point.Scale) + 5+"px");
+        overflow: hidden;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+
+
+    .center {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hide-scrollbar {
+        overflow: -moz-hidden-unscrollable;
+        overflow: hidden;
+    }
+
+    .border-line {
+        border-right: 3px solid #000;
+    }
+
+    /* remove top and bottom padding */
+    .note-color .dropdown-menu {
+        min-width: 168px !important;
+        padding: 0;
+    }
+    /* hide background color picker */
+    .note-color .note-palette:first-child {
+        display: none !important;
+    }
+    /* remove palette title */
+    .note-color .note-palette-title {
+        display: none;
+    }
+
+    .note-editing-area {
+        background-color: @Model.BackgroundColor;
+    }
+
+</style>

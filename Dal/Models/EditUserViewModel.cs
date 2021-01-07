@@ -13,8 +13,14 @@ namespace Dal.Models
         //public string Email { get; set; }        
         [Display(Name = "Имя")]
         public string Name { get; set; }
+
+        [Display(Name = "Телефон")]
+        public string PhoneNumber { get; set; }
+        
+
         [Display(Name = "Блокированный")]
         public bool Blocked { get; set; }
+
         [Display(Name = "Подтвержденный")]
         public bool EmailConfirmed { get; set; }
     }

@@ -97,7 +97,7 @@ namespace AdvScreen.Controllers
                 advertisements = advertisements.Where(a => a.Price<=curPrice);                
             }
             
-            if (await _userManager.IsInRoleAsync(CurrentUser, "Admin"))
+            if (await _userManager.IsInRoleAsync(CurrentUser, "Admin") || await _userManager.IsInRoleAsync(CurrentUser, "Moderator"))
             {
                 advertisements = advertisements.Include(a => a.AdvertisementStatus);
                 //return View("IndexAdmin",  advertisements.Include(a=>a.AdvertisementStatus).AsQueryable());
@@ -135,7 +135,7 @@ namespace AdvScreen.Controllers
             ViewBag.PageSize = pageSize;
             ViewBag.TotalRecords = advertisements.Count();
 
-            if (await _userManager.IsInRoleAsync(CurrentUser, "Admin"))
+            if (await _userManager.IsInRoleAsync(CurrentUser, "Admin") || await _userManager.IsInRoleAsync(CurrentUser, "Moderator"))
             {
                 return View("IndexAdmin",await PaginatedList<Advertisement>.CreateAsync(advertisements.AsNoTracking(), pN, pageSize));
                 //return View("IndexAdmin", advertisements);
@@ -148,6 +148,7 @@ namespace AdvScreen.Controllers
         }
 
         // GET: Advertisements/Details/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -260,6 +261,33 @@ namespace AdvScreen.Controllers
             return RedirectToAction("Edit", new { id = id });
         }
 
+        public async Task<IActionResult> SendToEdit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var advertisement = await _context.Advertisements.FindAsync(id);
+            if (advertisement == null)
+            {
+                return NotFound();
+            }
+
+            var currentUser = GetCurrentUser();
+            if (advertisement.ApplicationUser == currentUser || await _userManager.IsInRoleAsync(currentUser, "Admin"))
+            {
+                advertisement.AdvertisementStatusId = _context.AdvertisementStatuses.FirstOrDefault(s => s.Name == Dal.Models.AdvertisementStatusEnum.Created.ToString()).Id;
+                _context.Update(advertisement);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                ViewBag.Error = "Только Владлелец может отправить на объявление на модерацию";
+                return RedirectToAction("Error", "Home");
+            }            
+            return RedirectToAction("Edit", new { id = id });
+        }
+
 
 
         [Authorize(Roles ="Admin")]
@@ -340,18 +368,23 @@ namespace AdvScreen.Controllers
 
         public string GenerateAdvertisementNumber(Advertisement Advertisement)
         {
-            DateTime date = GetDateTimeWithoutSeconds (Advertisement.CreateDate);
-
+            
             //int advCount = _context.Advertisements.Where(a => GetDateTimeWithoutSeconds(a.CreateDate)==date).ToList().Count();
-            int advCount = _context.Advertisements.Where(a =>a.CreateDate.Date == date && a.CreateDate.Hour == date.Hour && a.CreateDate.Minute == date.Minute).Count();
-            string res = date.ToString("ddMMyyyyHHmm") + advCount.ToString().PadLeft(4, '0');
+            //int advCount = _context.Advertisements.Where(a =>a.CreateDate.Date == date && a.CreateDate.Hour == date.Hour && a.CreateDate.Minute == date.Minute).Count();
+            int advCount = _context.Advertisements
+                .Where(a => a.CreateDate.Date == Advertisement.CreateDate.Date 
+                && a.CreateDate.Hour == Advertisement.CreateDate.Hour 
+                && a.CreateDate.Minute == Advertisement.CreateDate.Minute)
+                .Count();
+            
+            string res = Advertisement.CreateDate.ToString("ddMMyyyyHHmm") + advCount.ToString().PadLeft(4, '0');
             return res;
         }
 
         public DateTime GetDateTimeWithoutSeconds(DateTime Dt)
         {
             //var t = new DateTime(Dt.Year,Dt.Month,Dt.Day,Dt.Hour,Dt.Minute,Dt.Second);
-            return new DateTime(Dt.Year, Dt.Month, Dt.Day, Dt.Hour, Dt.Minute, Dt.Second);
+            return new DateTime(Dt.Year, Dt.Month, Dt.Day, Dt.Hour, Dt.Minute, 0);
             //return new DateTime(Dt.Year, Dt.Month, Dt.Day, Dt.Hour, Dt.Minute, 0, DateTimeKind.Utc);
         }
 
@@ -605,9 +638,16 @@ namespace AdvScreen.Controllers
 
             var advertisement = await _context.Advertisements
                 .FirstOrDefaultAsync(m => m.Id == id);
+            
             if (advertisement == null)
             {
                 return NotFound();
+            }
+            
+            string curFilePath = _env.WebRootPath + advertisement.ImagePath;
+            if (System.IO.File.Exists(curFilePath))
+            {
+                System.IO.File.Delete(curFilePath);
             }
 
             return View(advertisement);
@@ -648,11 +688,11 @@ namespace AdvScreen.Controllers
         public async Task<IActionResult> FinishAdvertisements()
         {
             var activeAdvertisementsToFinish = _context.Advertisements.Where(a => a.AdvertisementStatus.Name == "Active" && a.EndDate <= DateTime.Now).Include(a=>a.AdvertisementStatus);
-            var finishStatus = _context.AdvertisementStatuses.SingleOrDefault(a => a.Name == "Finished");
+            var createdStatus = _context.AdvertisementStatuses.SingleOrDefault(a => a.Name == Dal.Models.AdvertisementStatusEnum.Created.ToString());
             var advCount =  activeAdvertisementsToFinish.Count();
             foreach (var ad in activeAdvertisementsToFinish)
             {
-                ad.AdvertisementStatusId= finishStatus.Id;
+                ad.AdvertisementStatusId= createdStatus.Id;
             }
             _context.SaveChangesAsync();
             ViewBag.Count = advCount;

@@ -111,6 +111,7 @@ namespace AdvScreen.Controllers
                 //, Email = user.Email
                 ,
                 Name = user.Name
+                , PhoneNumber = user.PhoneNumber
                 , Blocked = user.Blocked
                 , EmailConfirmed = user.EmailConfirmed
             };

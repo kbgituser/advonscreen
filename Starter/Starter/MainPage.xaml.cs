@@ -19,11 +19,11 @@ namespace Starter
         //Entry urlEntry;
         
         //public HtmlWebViewSource viewSource;
-        public int PointId = 2;
+        public int PointId = 1;
         public Cycle cycle;
         public bool Connected { get; set; }
-        //string baseUri = "https://adv.kenseler.kz";
-        string baseUri = "https://192.168.0.107:45455";
+        string baseUri = "https://adv.kenseler.kz";
+        //string baseUri = "https://192.168.0.107:45455";
         //string baseUri = "https://10.0.2.2:45455";
 
 
@@ -58,7 +58,7 @@ namespace Starter
             cycle = new Cycle(PointId, uri);
             cycle.onAdvChange += RefreshText;
             cycle.Init();
-            cycle.InternetConnected = (Connectivity.NetworkAccess == NetworkAccess.Internet);
+            cycle.InternetConnected = (Connectivity.NetworkAccess == NetworkAccess.Internet);            
             cycle.StartShowAsync(); // тоже работает
             
         }
@@ -77,16 +77,12 @@ namespace Starter
 
         public void RefreshText() 
         {
-
+            
             Device.BeginInvokeOnMainThread(() =>
             {
                 // UI interaction here
                 try
                 {
-
-                    string uri = "https://192.168.0.105:45455/adsapi/";
-                    string imgUri = "https://192.168.0.106:45455";
-
                     //CookieManager.Instance.RemoveAllCookie();
                     var html = "";
                     html += "<style>";
@@ -140,6 +136,8 @@ namespace Starter
                         html += "<div class='PointScreen'>";
                         html += cycle.CurrentAdvertisement.Text;
                         html += "</div>";
+                        viewSource.Html = html;
+                        webView.Source = viewSource;
                     }
                     else if (cycle.CurrentAdvertisement.AdvertisementType == AdvertisementType.Photo)
                     {
@@ -150,16 +148,44 @@ namespace Starter
                         "class='PointImage' " +
                         "/>";
                         //html += "</div>";
+                        viewSource.Html = html;
+                        webView.Source = viewSource;
                     }
                     else if (cycle.CurrentAdvertisement.AdvertisementType == AdvertisementType.Video)
                     {
-                        html += cycle.CurrentAdvertisement.Video ;
+                        html += "<script>";
+                        // Load the IFrame Player API code asynchronously.
+                        html += "var tag = document.createElement('script');";
+                        html += "tag.src = \"https://www.youtube.com/player_api\";var firstScriptTag = document.getElementsByTagName('script')[0];firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);";
+                        // Replace the 'ytplayer' element with an <iframe> and
+                        // YouTube player after the API code downloads.
+                        html += "var player;";
+                        html += "function onYouTubePlayerAPIReady() {player = new YT.Player('ytplayer', { height: '360', width: '640', videoId: 'M7lc1UVf-VE'" +
+                        ",playerVars: {autoplay: 1,controls: 0}" +
+                        ",events: {'onReady': onPlayerReady}"
+                        + "});" +
+                        "function onPlayerReady(event) {player.mute();event.target.playVideo();}"
+                        +
+                        "}";
+
+                        html += "</script>";
+                        html += "<div id=\"ytplayer\"></div>";
+
+                        /// <summary>
+                        /// ////////
+                        /// </summary>
+                        //html += cycle.CurrentAdvertisement.Video ;
+
+                        viewSource.Html = html;
+                        webView.Source = viewSource;
+
+                        //webView.Source = "https://www.youtube.com/embed/rAGh8iy9YnU";
+                        //viewSource.Html = cycle.CurrentAdvertisement.Video;
+                        //webView.Source = viewSource;
                     }
 
-
-
-                    viewSource.Html = html;                    
-                    webView.Source = viewSource;
+                    //viewSource.Html = html;                    
+                    //webView.Source = viewSource;
                 }
                 catch (Exception e)
                 {

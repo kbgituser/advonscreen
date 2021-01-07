@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using AdvScreen.Models;
 using AdvScreen.Areas.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace AdvScreen
 {
@@ -76,6 +77,17 @@ namespace AdvScreen
                 )
             );
 
+            services.AddMvc().AddRazorPagesOptions(options =>
+            {
+                options.Conventions.AddPageRoute("/Advertisements/Index", "");
+            });
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.Expiration = TimeSpan.FromHours(48);
+                });
+
+
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
@@ -99,7 +111,8 @@ namespace AdvScreen
                 // User settings.
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                options.User.RequireUniqueEmail = true;
+                options.User.RequireUniqueEmail = false;
+                
                 options.SignIn.RequireConfirmedEmail = true;
                 options.SignIn.RequireConfirmedAccount = true;
             });
@@ -143,7 +156,7 @@ namespace AdvScreen
                 DbInitializer.Initialize(app);
             }
             else
-            {
+            {                
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();

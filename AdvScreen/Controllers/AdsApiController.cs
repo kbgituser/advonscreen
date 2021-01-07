@@ -72,10 +72,10 @@ namespace AdvScreen.Controllers
             {
                 advertisement = await advs.FirstOrDefaultAsync();
             }
-            if (advertisement == null)
-            {
-                return NotFound();
-            }
+            //if (advertisement == null)
+            //{
+            //    return NotFound();
+            //}
             return Ok(advertisement);
         }
 

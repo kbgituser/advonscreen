@@ -4,12 +4,17 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>aspnet-AdvScreen-332E09F6-FE6A-4524-B921-3AE6CE316D03</UserSecretsId>
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Identity\Pages\Account\Manage\**" />
     <Compile Remove="Data\Migrations\**" />
+    <Content Remove="Areas\Identity\Pages\Account\Manage\**" />
     <Content Remove="Data\Migrations\**" />
+    <EmbeddedResource Remove="Areas\Identity\Pages\Account\Manage\**" />
     <EmbeddedResource Remove="Data\Migrations\**" />
+    <None Remove="Areas\Identity\Pages\Account\Manage\**" />
     <None Remove="Data\Migrations\**" />
   </ItemGroup>
 

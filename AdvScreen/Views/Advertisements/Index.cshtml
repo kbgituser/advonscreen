@@ -6,7 +6,7 @@
 }
 <h1>Ваши объявления</h1>
 <p>
-    <a asp-action="Create">Создать новое объявление</a>
+    <a asp-action="Create" class="btn btn-success">Создать новое объявление</a>
 </p>
 <table class="table">
     <thead>
@@ -73,8 +73,7 @@
                 @Html.DisplayFor(modelItem => item.Price)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Изменить</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Детали</a> |
+                <a asp-action="Edit" asp-route-id="@item.Id">Изменить</a> |                
                 <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
             </td>
         </tr>

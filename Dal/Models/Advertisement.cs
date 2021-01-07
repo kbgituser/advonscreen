@@ -44,7 +44,7 @@ namespace Dal.Models
         public int AdvertisementStatusId { get; set; }
         public virtual AdvertisementStatus AdvertisementStatus { get; set; }
 
-        [Display(Name = "Содержание")]
+        [Display(Name = "Вид содержания")]
         public AdvertisementType AdvertisementType { get; set; }
 
         [Display(Name = "Цвет фона")]

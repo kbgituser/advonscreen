@@ -40,6 +40,8 @@
         </div>
     </div>
     <input type="submit" value="Поиск" class="btn btn-success" />
+    <a action="Index" asp-route-advertisementStatus="2" class="btn btn-success">На модерации</a>
+    <a action="Index" asp-route-advertisementStatus="3" class="btn btn-success">К оплате</a>
 </form>
 <br />
 <paging total-records="@ViewBag.TotalRecords"

@@ -4,67 +4,110 @@
     ViewData["Title"] = "Оплата";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<style>
+    .PointImage {
+        height: @(Model.Point.Height+"px");
+        width: @(Model.Point.Width+"px");
+        transform-origin: 0 0;
+        transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) );
+        border: 6px solid;
+        white-space: normal;
+        overflow: hidden;
+        background-position: center center;
+        background-repeat: no-repeat;
+        object-fit: contain;
+    }
+
+    .wrap {
+        height: @(Math.Ceiling(Model.Point.Height * Model.Point.Scale) + 6+ "px");
+        width: @(Math.Ceiling(Model.Point.Width * Model.Point.Scale) + 5+"px");
+        overflow: hidden;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .center {
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+
 <div>
     <h4>@ViewData["Title"]</h4>
-
     <h4 class="text-danger text-center">@TempData["Message"]</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Duration)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Duration)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.DurationInDays)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.DurationInDays)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.CreateDate)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.CreateDate)
         </dd>
-        
-        <dt class = "col-sm-2">
+
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Title)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Title)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.AdvertisementType)
+        </dt>
+        <dd class="col-sm-10">
+
+            @Html.DisplayFor(model => (model.AdvertisementType))
+
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Text)
         </dt>
         <dd class="col-sm-10">
             @*@Html.DisplayFor(model => model.Text)*@
             @Html.Raw(Model.Text)
         </dd>
-        <dt class = "col-sm-2">
+
+
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.AdNumber)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.AdNumber)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Price)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Price)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Point)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Point.Name)
         </dd>
     </dl>
 </div>
-<div>
 
-    <a asp-action="Index">К списку объявлений</a> |    
+<div class="wrap">
+    <img id="image" src=@Model.ImagePath
+         class="PointImage" />
+</div>
+
+<div>
+    <a asp-action="Index">К списку объявлений</a> |
     <a asp-action="PaymentConfirmed" asp-route-id="@Model.Id">Зачисление оплаты</a> |
     <a asp-action="PaymentConfirmed" asp-route-id="@Model.Id" asp-route-wait="true">Зачисление оплаты и в очередь</a> |
 </div>

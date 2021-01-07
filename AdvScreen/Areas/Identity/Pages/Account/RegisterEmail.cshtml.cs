@@ -18,14 +18,14 @@ using Microsoft.Extensions.Logging;
 namespace AdvScreen.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
-    public class RegisterModelPhone : PageModel
+    public class RegisterModelEmail : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
-        public RegisterModelPhone(
+        public RegisterModelEmail(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
@@ -46,14 +46,21 @@ namespace AdvScreen.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required(ErrorMessage = "Укажите номер телефона корректно!")]
-            [Phone]
-            [Display(Name = "Телефон")]
-            [DataType(DataType.PhoneNumber)]
+            [Required]
+            [EmailAddress]
+            [Display(Name = "Email")]
+            public string Email { get; set; }
 
-            [RegularExpression(@"^\(?([0-9]{1})\)?[-. ]?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Номер телефона введен некорректно!")]
-            //[RegularExpression(@"^\(?+7([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Телефон введен некорректно!")]
-            public string Phone { get; set; }            
+            [Required]
+            [StringLength(100, ErrorMessage = "{0} должен быть длиной минимум {2} и максимум {1} символов.", MinimumLength = 3)]
+            [DataType(DataType.Password)]
+            [Display(Name = "Пароль")]
+            public string Password { get; set; }
+
+            [DataType(DataType.Password)]
+            [Display(Name = "Подтверждение пароля")]
+            [Compare("Password", ErrorMessage = "Пароль и подтверждение пароля не совпадают.")]
+            public string ConfirmPassword { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -68,15 +75,32 @@ namespace AdvScreen.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Phone, PhoneNumber = Input.Phone };
-                var result = await _userManager.CreateAsync(user);
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return LocalRedirect(returnUrl);
-                    
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Page(
+                        "/Account/ConfirmEmail",
+                        pageHandler: null,
+                        values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
+                        protocol: Request.Scheme);
+
+                    await _emailSender.SendEmailAsync(Input.Email, "Подтвердите Вашу почту",
+                        $"Пожалуйста подтвердите регистрацию <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>нажав здесь</a>.");
+
+                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    {
+                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                    }
+                    else
+                    {
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        return LocalRedirect(returnUrl);
+                    }
                 }
                 foreach (var error in result.Errors)
                 {

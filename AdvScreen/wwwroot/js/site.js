@@ -23,9 +23,27 @@ $(document).ready(function () {
     //});
 
     $(".allownumericwithdecimal").on("keypress keyup blur", function (event) {
+
+        //$(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+        //if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+        //    event.preventDefault();
+        //}
+
         $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
-        if ((event.which != 46 || $(this).val().indexOf('.') != -1 || $(this).val().indexOf(',') != -1) && (event.which < 48 || event.which > 57 || event.whitch === 188 || event.which === 110)) {
+        if (
+            
+            
+            (event.which != 46 || $(this).val().indexOf('.') != -1)
+            
+            //&& (event.which != 188 || $(this).val().indexOf(',') != -1)
+            //&& (e.keyCode != 188 || e.keyCode != 110)
+            && (event.which < 48 || event.which > 57)
+            && (event.which != 13)
+            
+        ) {
+            
             event.preventDefault();
+            
         }
     });
 
@@ -35,4 +53,6 @@ $(document).ready(function () {
             event.preventDefault();
         }
     });
+
+
 });

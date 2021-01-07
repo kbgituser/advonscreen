@@ -22,7 +22,7 @@
         </Label>
     </StackLayout>-->
 
-    <StackLayout>
+    <StackLayout Rotation="90">
         <!--<StackLayout Orientation="Horizontal">
             <Button Text="Go" Clicked="button_Clicked" />
             <Entry x:Name="urlEntry" HorizontalOptions="FillAndExpand" />

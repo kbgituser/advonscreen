@@ -1,8 +1,66 @@
-﻿@{
+﻿
+
+
+@{
     ViewData["Title"] = "Размещение объявления";
 }
 
 <div class="text-center">
     <h1 class="display-4">Разместите объявление</h1>
     <a asp-action="Create" asp-controller="Advertisements" class="btn-success btn">Разместить объявление</a>
+    <a asp-action="Index" asp-controller="Advertisements" class="btn-success btn">Мои объявления</a>
+    <br />
 </div>
+
+@*<video muted autoplay="autoplay" src="https://aitube.kz/video?id=f03a473f-e115-4c22-9e7d-7cb692780ef3"></video>*@
+
+@*https://yadi.sk/i/xyOaWMB_kRzp0w*@
+
+@*<iframe id="ytplayer" type="text/html" width="640" height="360"
+    src="https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&muted=1&origin=http://example.com"
+    frameborder="0"></iframe>*@
+
+@*<iframe src="https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&mute=1" name="youtube embed" allow="autoplay; encrypted-media" allowfullscreen frameborder="0" width="640" height="360"></iframe>*@
+
+
+
+@*<iframe src="https://player.vimeo.com/video/483908623?autoplay=1&loop=1&autopause=0&muted=1" width="640" height="346" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>*@
+
+<br />
+
+@*<div id="ytplayer"></div>
+    @section Scripts{
+        <script>
+            // Load the IFrame Player API code asynchronously.
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/player_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+            // Replace the 'ytplayer' element with an <iframe> and
+            // YouTube player after the API code downloads.
+            var player;
+            function onYouTubePlayerAPIReady() {
+                player = new YT.Player('ytplayer', {
+                    height: '360',
+                    width: '640',
+                    videoId: 'M7lc1UVf-VE',
+                    playerVars: { 'autoplay': 1, 'controls': 1, 'playsinline': 1 },
+                    events: {
+                        'onReady': onPlayerReady
+                    }
+                });
+
+                function onPlayerReady(event) {
+                    player.mute();
+                    event.target.playVideo();
+                    //player.unMute();
+                    //player.setVolume(100);
+                }
+
+            }
+        </script>
+    }*@
+
+<div style="position: relative; width: 100%; height: 0; padding-top: 141.4286%; padding-bottom: 48px; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden; border-radius: 8px; will-change: transform;">  <iframe style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;" src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAEScBgSN3s&#x2F;view?embed">  </iframe></div>
+

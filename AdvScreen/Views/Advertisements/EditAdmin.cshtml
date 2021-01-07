@@ -2,7 +2,7 @@
 @using Dal.Models
 
 
-<style>
+<!--<style>
     #screenEmulator{
 
     }
@@ -22,8 +22,6 @@
         background-repeat: no-repeat;
         /*object-fit: none;*/
 
-        /*проба*/
-        
     }
 
     .PointImage {
@@ -46,16 +44,14 @@
 
     .wrap {
         /*height: 100px;
-        width: 100px;*/
-
-
-        @*@{
-            var height = Math.Ceiling (Model.Point.Height * Model.Point.Scale);
-            var width = Math.Ceiling (Model.Point.Width * Model.Point.Scale);
-        }*@
-        @*height: @((Model.Point.Height* Model.Point.Scale +6) +"px");
-        width: @((Model.Point.Width* Model.Point.Scale +6) +"px");*@
-        height: @(Math.Ceiling(Model.Point.Height * Model.Point.Scale) + 6+ "px");
+        width: 100px;*/-->
+@*@{
+        var height = Math.Ceiling (Model.Point.Height * Model.Point.Scale);
+        var width = Math.Ceiling (Model.Point.Width * Model.Point.Scale);
+    }*@
+@*height: @((Model.Point.Height* Model.Point.Scale +6) +"px");
+    width: @((Model.Point.Width* Model.Point.Scale +6) +"px");*@
+<!--height: @(Math.Ceiling(Model.Point.Height * Model.Point.Scale) + 6+ "px");
         width: @(Math.Ceiling(Model.Point.Width * Model.Point.Scale) + 5+"px");
         /*border: dotted 3px;*/
         overflow: hidden;
@@ -94,7 +90,7 @@
     .note-editing-area {
         background-color: @Model.BackgroundColor;
     }
-    
+
     /*.wrap:hover {
         height: 300px;
         width: 260px;
@@ -109,8 +105,8 @@
         -moz-transform-origin: left top;*/
         /* more transform-origin */
     /*}*/
-</style>
-
+</style>-->
+@Html.Partial("SharedEdit.cshtml")
 
 @section Scripts {
 
@@ -146,7 +142,7 @@
         $(function () {
 
             $('#Text').summernote({
-                
+
                 lang: 'ru-RU',
                 maximumImageFileSize: 1024 * 1024, // 500 KB
                 callbacks: {
@@ -158,7 +154,7 @@
                         $('#screenEmulator').html($(this).val());
                     }
                     ,
-                    onBlur: function (e) {                        
+                    onBlur: function (e) {
                         $('#screenEmulator').html($(this).val());
                     }
                     ,
@@ -171,9 +167,7 @@
                 toolbar: [
                     ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
                     ['fontname', ['fontname']],
-                    ['color', ['color']],
-                    ['table', ['table']],
-                    ['insert', ['picture']],
+                    ['color', ['color']],                    
                     ['para', ['paragraph', 'height']]
                 ]
             });
@@ -181,11 +175,11 @@
             var fontBackColor = $('button.note-btn.btn.btn-light.btn-sm.note-current-color-button');
             fontBackColor.attr("data-backcolor", "#1C00ff00");
 
-            $("#Text").on("summernote.mouseup", function (e, mouseEvent) {                
+            $("#Text").on("summernote.mouseup", function (e, mouseEvent) {
                 $('#screenEmulator').html($(this).val());
             })
 
-            $('#Text').on('summernote.focus', function () {                
+            $('#Text').on('summernote.focus', function () {
                 $('#screenEmulator').html($(this).val());
             });
 
@@ -203,7 +197,6 @@
             $("#sendToModerate").click(function () {
                 if (confirm("После отправки на модерацию вы не сможете изменить объявление! Вы уверены что хотите отправить объявление на проверку?")) {
                     $('#forModeration').val(true);
-                    alert($('#forModeration').val());
                     $('#form').FormSubmit();
                 }
                 else {
@@ -277,12 +270,9 @@
             </div>
 
             <div class="text-center">
-
-
-
                 <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Text) ? "checked" : "") value=@Dal.Models.AdvertisementType.Text name="AdvertisementType" autocomplete="off" id="radioText" /><label for="radioText">Текст</label>
                 <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Photo) ? "checked" : "") value=@Dal.Models.AdvertisementType.Photo name="AdvertisementType" autocomplete="off" id="radioPhoto" /><label for="radioPhoto">Изображение</label>
-                <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Video) ? "checked" : "") value=@Dal.Models.AdvertisementType.Video name="AdvertisementType" autocomplete="off" id="radioVideo" /><label for="radioVideo">Видео</label>
+                @*<input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Video) ? "checked" : "") value=@Dal.Models.AdvertisementType.Video name="AdvertisementType" autocomplete="off" id="radioVideo" /><label for="radioVideo">Видео</label>*@
             </div>
 
             <div class="form-group text-center">
@@ -342,7 +332,7 @@
                         <input type="submit" value="Сохранить" class="btn btn-primary" @*onclick="return FormSubmit();"*@ />
                     </div>
                     <div class="col-md-6">
-                        <div class="text-center text-info">Так будет выглядеть текст на экране</div>
+                        <div class="text-center text-info">Так будет выглядеть текст на экране</div>                        
                         <div class="wrap">
                             <div class="PointScreen" style="font-size: @(Model.FontSize+"px");" id="screenEmulator">
                                 @Html.Raw(Model.Text)
@@ -362,7 +352,6 @@
                     <div class="text-center text-info">Так будет выглядеть изображение на экране</div>
                     <div class="wrap">
                         <img id="image" src=@Model.ImagePath
-                             @*width="@(Math.Ceiling(Model.Point.Width*Model.Point.Scale))" height="@(Math.Ceiling(Model.Point.Height*Model.Point.Scale))"*@
                              class="PointImage" />
                     </div>
                 </div>
@@ -379,3 +368,4 @@
         </form>
     </div>
 </div>
+

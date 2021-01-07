@@ -18,14 +18,14 @@ using System.Text;
 namespace AdvScreen.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
-    public class LoginModelPhone : PageModel
+    public class LoginModelEmail : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
         private readonly IEmailSender _emailSender;
 
-        public LoginModelPhone(SignInManager<ApplicationUser> signInManager, 
+        public LoginModelEmail(SignInManager<ApplicationUser> signInManager, 
             ILogger<LoginModel> logger,
             UserManager<ApplicationUser> userManager
             , IEmailSender emailSender
@@ -50,12 +50,13 @@ namespace AdvScreen.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [Phone]
-            [Display(Name = "Телефон")]
-            [DataType(DataType.PhoneNumber)]
-            [RegularExpression(@"^\(?([0-9]{1})\)?[-. ]?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Номер телефона введен некорректно!")]
+            [EmailAddress]
+            public string Email { get; set; }
 
-            public string Phone { get; set; }
+            [Required]
+            [Display(Name = "Пароль")]
+            [DataType(DataType.Password)]
+            public string Password { get; set; }
 
             [Display(Name = "Запомнить меня?")]
             public bool RememberMe { get; set; }
@@ -86,30 +87,49 @@ namespace AdvScreen.Areas.Identity.Pages.Account
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                
-                ApplicationUser user = await _userManager.FindByNameAsync(Input.Phone);
-
+                var user = await _userManager.FindByNameAsync(Input.Email);
                 if (user != null)
                 {
                     // проверяем, подтвержден ли email
-                    if (await _userManager.IsInRoleAsync(user, "Admin"))
+                    if (!await _userManager.IsEmailConfirmedAsync(user))
                     {
-                        return RedirectToPage("./LoginEmail", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
+                            protocol: Request.Scheme);
+
+                        await _emailSender.SendEmailAsync(Input.Email, "Подтвердите Вашу почту",
+                        $"Пожалуйста подтвердите регистрацию <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>нажав здесь</a>.");
+                        ModelState.AddModelError(string.Empty, "Вы не подтвердили свой email (свою почту). Проверьте вашу почту, Вам отправлено письмо!");
+                        return Page();
                     }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, true);
-                        return LocalRedirect(returnUrl);
-                    }
+                }
+                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
+                if (result.Succeeded)
+                {                    
+                    _logger.LogInformation("User logged in.");
+                    return LocalRedirect(returnUrl);
+                }
+                if (result.RequiresTwoFactor)
+                {
+                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                }
+                if (result.IsLockedOut)
+                {
+                    _logger.LogWarning("User account locked out.");
+                    return RedirectToPage("./Lockout");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Данный номер незарегистрирован в системе!");
+                    ModelState.AddModelError(string.Empty, "Логин или пароль неверны!");
                     return Page();
                 }
             }
             // If we got this far, something failed, redisplay form
-            ModelState.AddModelError(string.Empty, "Ошибка!");
             return Page();
         }
     }

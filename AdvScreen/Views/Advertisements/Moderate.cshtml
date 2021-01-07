@@ -1,4 +1,4 @@
-﻿<style>
+﻿@*<style>
 
     #screenEmulator{
 
@@ -29,7 +29,8 @@
     .wrap {        
         height: 100px;        
     }
-</style>
+</style>*@
+@Html.Partial("SharedEdit.cshtml")
 
 @model Dal.Models.Advertisement
 
@@ -88,12 +89,36 @@
                     <input asp-for="AdNumber" class="form-control" disabled="disabled" />
                     <span asp-validation-for="AdNumber" class="text-danger"></span>
                 </div>
+
+                <div class="form-group col-md-6">
+                    <label asp-for="AdvertisementType" class="control-label"></label>
+                    <input asp-for="AdvertisementType" class="form-control" disabled="disabled" />
+                    <span asp-validation-for="AdvertisementType" class="text-danger"></span>
+                </div>
             </div>
     </div>
 
-    <div class="col-md-6 wrap">
-        <div class="PointScreen" style="font-size: @(Model.FontSize+"px");" id="screenEmulator">
-            @Html.Raw(Model.Text)
+    <div class="col-md-6">
+        @if (Model.AdvertisementType == Dal.Models.AdvertisementType.Text)
+        {
+            <div class="wrap">
+                <div class="PointScreen" style="font-size: @(Model.FontSize + "px");" id="screenEmulator">
+                    @Html.Raw(Model.Text)
+                </div>
+            </div>
+            
+         }
+            else if (Model.AdvertisementType == Dal.Models.AdvertisementType.Photo)
+            {
+            <div class="text-center text-info">Так будет выглядеть изображение на экране</div>
+            <div class="wrap">
+                <img id="image" src=@Model.ImagePath
+                     class="PointImage" />
+            </div>
+            }
+            else if (Model.AdvertisementType == Dal.Models.AdvertisementType.Video)
+            {
+            
+            }
         </div>
-    </div>
 </div>
