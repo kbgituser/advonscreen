@@ -61,7 +61,7 @@ namespace Starter
 
         public async Task StartShowAsync()
         {
-            await Task.Run(() => StartShow());            
+            await Task.Run(() => StartShow());
             //Task.Factory.StartNew(() => StartShow());
             //Task.Run(StartShow);
             //StartShow();
@@ -96,6 +96,11 @@ namespace Starter
                 if (CurrentAdvertisement != null)
                 {
                     Task.Delay(CurrentAdvertisement.Duration * 1000).Wait();
+                    // даю время на загрузку
+                    if (CurrentAdvertisement.AdvertisementType == AdvertisementType.Video)
+                    {
+                        Task.Delay(10 * 1000).Wait();
+                    }
                 }
                 // подумать как обновлять состояние
                 Point = GetPoint();
@@ -122,16 +127,18 @@ namespace Starter
 
         private void SetNextAdvertisement(Advertisement spareAd)
         {
-            if (NextAdvertisement != null)
-            {
-                CurrentAdvertisement = NextAdvertisement;
-                NextAdvertisement = GetNext();
-            }
-            else
-            {
-                CurrentAdvertisement = GetNext();
-                NextAdvertisement = GetNext();
-            }
+            //if (NextAdvertisement != null)
+            //{
+            //    CurrentAdvertisement = NextAdvertisement;
+            //    NextAdvertisement = GetNext();
+            //}
+            //else
+            //{
+            //    CurrentAdvertisement = GetNext();
+            //    NextAdvertisement = GetNext();
+            //}
+
+            CurrentAdvertisement = GetNext();
             if (CurrentAdvertisement == null && spareAd != null) CurrentAdvertisement = spareAd;
             advText = (CurrentAdvertisement != null) ? CurrentAdvertisement.Text : "";
             onAdvChange();

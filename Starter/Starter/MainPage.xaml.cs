@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using YoutubeExplode;
+using YoutubeExplode.Videos.Streams;
 
 namespace Starter
 {
@@ -22,9 +24,11 @@ namespace Starter
         public int PointId = 1;
         public Cycle cycle;
         public bool Connected { get; set; }
-        string baseUri = "https://adv.kenseler.kz";
+        string baseUri = "https://redi.kz";
         //string baseUri = "https://192.168.0.107:45455";
         //string baseUri = "https://10.0.2.2:45455";
+        private bool _firstAppearance = true;
+
 
 
         public MainPage()
@@ -44,22 +48,29 @@ namespace Starter
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
-            Connected = Connectivity.NetworkAccess == NetworkAccess.Internet;
 
-            //uri = "https://adv.kenseler.kz/adsapi/";
+            if (_firstAppearance)
+            {
+                _firstAppearance = false;
+                Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
+                Connected = Connectivity.NetworkAccess == NetworkAccess.Internet;
 
-            string uri = baseUri+ "/adsapi/";
-            //uri = "https://192.168.0.106:45455/adsapi/";
-            //uri = "https://adv.kenseler.kz/adsapi/";
+                //uri = "https://adv.kenseler.kz/adsapi/";
 
-            //uri = "https://10.0.2.2:44379/adsapi/";
+                string uri = baseUri + "/adsapi/";
+                //uri = "https://192.168.0.106:45455/adsapi/";
+                //uri = "https://adv.kenseler.kz/adsapi/";
 
-            cycle = new Cycle(PointId, uri);
-            cycle.onAdvChange += RefreshText;
-            cycle.Init();
-            cycle.InternetConnected = (Connectivity.NetworkAccess == NetworkAccess.Internet);            
-            cycle.StartShowAsync(); // тоже работает
+                //uri = "https://10.0.2.2:44379/adsapi/";
+
+                cycle = new Cycle(PointId, uri);
+                cycle.onAdvChange += RefreshText;
+                cycle.Init();
+                cycle.InternetConnected = (Connectivity.NetworkAccess == NetworkAccess.Internet);
+                cycle.StartShowAsync(); // тоже работает
+            }
+
+            
             
         }
 
@@ -83,7 +94,12 @@ namespace Starter
                 // UI interaction here
                 try
                 {
-                    //CookieManager.Instance.RemoveAllCookie();
+                    
+                    if (Navigation.NavigationStack.Count > 1)
+                    {
+                        Navigation.PopAsync();
+                    }
+
                     var html = "";
                     html += "<style>";
                     html += "html, body {margin:0px;padding:0px;}";
@@ -116,15 +132,17 @@ namespace Starter
                     //"border: 2px solid;" +
                     "white-space: normal;" +
                     //"line-height: 0.8;" +                    
-                    //"line-height: 1;" +                    
+                    //"line-height: 1;" +                                  
+                    //это восстановить
                     "background-color: " + cycle.CurrentAdvertisement.BackgroundColor +";"+
 
                     //"background-image: linear-gradient(to bottom,rgba(240, 255, 40, 1) 0%,"+
                     //    "rgba(240, 255, 40, 1) 100%),linear - gradient(to bottom,rgba(240, 40, 40, 1) 0%,rgba(240, 40, 40, 1) 100%);"+
                     //"background-clip: content-box, padding-box;"+
 
-                    "font-size: " + cycle.CurrentAdvertisement.FontSize + "px;}"
-                    + "p {line-height: 1; margin-bottom: 0; margin-top: 0; margin: 0;}"
+
+                    "font-size: " + cycle.CurrentAdvertisement.FontSize + "px;}" +
+                    "p {line-height: 1; margin-bottom: 0; margin-top: 0; margin: 0;}"
 
                     ;
 
@@ -153,33 +171,43 @@ namespace Starter
                     }
                     else if (cycle.CurrentAdvertisement.AdvertisementType == AdvertisementType.Video)
                     {
-                        html += "<script>";
-                        // Load the IFrame Player API code asynchronously.
-                        html += "var tag = document.createElement('script');";
-                        html += "tag.src = \"https://www.youtube.com/player_api\";var firstScriptTag = document.getElementsByTagName('script')[0];firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);";
-                        // Replace the 'ytplayer' element with an <iframe> and
-                        // YouTube player after the API code downloads.
-                        html += "var player;";
-                        html += "function onYouTubePlayerAPIReady() {player = new YT.Player('ytplayer', { height: '360', width: '640', videoId: 'M7lc1UVf-VE'" +
-                        ",playerVars: {autoplay: 1,controls: 0}" +
-                        ",events: {'onReady': onPlayerReady}"
-                        + "});" +
-                        "function onPlayerReady(event) {player.mute();event.target.playVideo();}"
-                        +
-                        "}";
 
-                        html += "</script>";
-                        html += "<div id=\"ytplayer\"></div>";
+                        if (Navigation.NavigationStack.Count < 2)
+                        {
+                            Navigation.PushAsync(new VideoPage(cycle.CurrentAdvertisement.Video));
+                        }
 
-                        /// <summary>
-                        /// ////////
-                        /// </summary>
-                        //html += cycle.CurrentAdvertisement.Video ;
+
+                        //webView.Source = "https://www.youtube.com/embed/rAGh8iy9YnU";
+
+
+                        //html += "<script>";
+                        //// Load the IFrame Player API code asynchronously.
+                        //html += "var tag = document.createElement('script');";
+                        //html += "tag.src = \"https://www.youtube.com/player_api\";var firstScriptTag = document.getElementsByTagName('script')[0];firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);";
+                        //// Replace the 'ytplayer' element with an <iframe> and
+                        //// YouTube player after the API code downloads.
+                        //html += "var player;";
+                        //html += "function onYouTubePlayerAPIReady() {player = new YT.Player('ytplayer', { height: '360', width: '640', videoId: 'M7lc1UVf-VE'" +
+                        //",playerVars: {autoplay: 1,controls: 0}" +
+                        //",events: {'onReady': onPlayerReady}"
+                        //+ "});" +
+                        //"function onPlayerReady(event) {player.mute();event.target.playVideo();}"
+                        //+
+                        //"}";
+
+                        //html += "</script>";
+                        //html += "<div id=\"ytplayer\"></div>";
+
+                        ///// <summary>
+                        ///// ////////
+                        ///// </summary>
+                        ////html += cycle.CurrentAdvertisement.Video ;
 
                         viewSource.Html = html;
                         webView.Source = viewSource;
 
-                        //webView.Source = "https://www.youtube.com/embed/rAGh8iy9YnU";
+
                         //viewSource.Html = cycle.CurrentAdvertisement.Video;
                         //webView.Source = viewSource;
                     }
@@ -196,6 +224,7 @@ namespace Starter
             });
         }
 
+        
         public async void test()
         {                  
             string url = "https://adv.kenseler.kz/adsapi1/getadvertisement/1/1";

@@ -272,7 +272,7 @@
             <div class="text-center">
                 <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Text) ? "checked" : "") value=@Dal.Models.AdvertisementType.Text name="AdvertisementType" autocomplete="off" id="radioText" /><label for="radioText">Текст</label>
                 <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Photo) ? "checked" : "") value=@Dal.Models.AdvertisementType.Photo name="AdvertisementType" autocomplete="off" id="radioPhoto" /><label for="radioPhoto">Изображение</label>
-                @*<input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Video) ? "checked" : "") value=@Dal.Models.AdvertisementType.Video name="AdvertisementType" autocomplete="off" id="radioVideo" /><label for="radioVideo">Видео</label>*@
+                <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Video) ? "checked" : "") value=@Dal.Models.AdvertisementType.Video name="AdvertisementType" autocomplete="off" id="radioVideo" /><label for="radioVideo">Видео</label>
             </div>
 
             <div class="form-group text-center">

@@ -9,9 +9,11 @@ namespace Starter
     {
         public App()
         {
+            Device.SetFlags(new string[] { "MediaElement_Experimental" });
             InitializeComponent();
 
-            MainPage = new MainPage();            
+            //MainPage = new MainPage();
+            MainPage = new NavigationPage(new MainPage());
         }
         public bool Connected { get; set; }
 
