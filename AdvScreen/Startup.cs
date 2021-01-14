@@ -126,7 +126,7 @@ namespace AdvScreen
                 options.LogoutPath = "/Identity/Account/Logout"; // If the LogoutPath is not set here, ASP.NET Core will default to /Account/Logout
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
                 options.SlidingExpiration = true;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(20);      // 20 minutes logged in session timeout
+                options.ExpireTimeSpan = TimeSpan.FromDays(2);      // 20 minutes logged in session timeout
 
             });
 

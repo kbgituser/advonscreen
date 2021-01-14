@@ -1,36 +1,4 @@
-﻿@*<style>
-
-    #screenEmulator{
-
-    }
-
-    .PointScreen {
-        /* this is the render are dimension */
-        /* media queries look up to this */
-        height: @(Model.Point.Height+"px");
-        width: @(Model.Point.Width+"px");
-        /*height: 1079px;
-        width: 1918px;*/
-        transform-origin: 0 0;
-        /*transform: scale(0.287);*/
-        transform: scale(@Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture));
-
-        /* you can calculate it by something like :
-        108/326*2 = 0.663 => 0.67*/
-        /* zoom:...; */ /* This is non-standard feature */
-        /* FireFox and Opera don't support it */
-        border: 2px solid;        
-        /*white-space: pre-line;*/
-        white-space: normal;
-        /*overflow: hidden;*/
-        /*white-space: nowrap;*/
-    }
-
-    .wrap {        
-        height: 100px;        
-    }
-</style>*@
-@Html.Partial("SharedEdit.cshtml")
+﻿@Html.Partial("SharedEdit.cshtml")
 
 @model Dal.Models.Advertisement
 
@@ -101,24 +69,32 @@
     <div class="col-md-6">
         @if (Model.AdvertisementType == Dal.Models.AdvertisementType.Text)
         {
-            <div class="wrap">
-                <div class="PointScreen" style="font-size: @(Model.FontSize + "px");" id="screenEmulator">
-                    @Html.Raw(Model.Text)
-                </div>
+        <div class="text-center text-info">Так будет выглядеть текст на экране</div>
+        <div class="wrap">
+            <div class="PointScreen" style="font-size: @(Model.FontSize + "px");" id="screenEmulator">
+                @Html.Raw(Model.Text)
             </div>
-            
-         }
-            else if (Model.AdvertisementType == Dal.Models.AdvertisementType.Photo)
-            {
-            <div class="text-center text-info">Так будет выглядеть изображение на экране</div>
-            <div class="wrap">
-                <img id="image" src=@Model.ImagePath
-                     class="PointImage" />
-            </div>
-            }
-            else if (Model.AdvertisementType == Dal.Models.AdvertisementType.Video)
-            {
-            
-            }
         </div>
+
+        }
+        else if (Model.AdvertisementType == Dal.Models.AdvertisementType.Photo)
+        {
+        <div class="text-center text-info">Так будет выглядеть изображение на экране</div>
+        <div class="wrap">
+            <img id="image" src=@Model.ImagePath
+                 class="PointImage" />
+        </div>
+        }
+        else if (Model.AdvertisementType == Dal.Models.AdvertisementType.Video)
+        {
+        <div>
+            <label asp-for="Video" class="control-label"></label>
+
+            @*<input asp-for="Video" class="form-control" disabled="disabled" />*@
+            <a class="form-control" target="_blank" href="@Model.Video">@Model.Video</a>
+            <span asp-validation-for="Video" class="text-danger"></span>
+        </div>
+
+        }
+    </div>
 </div>

@@ -8,7 +8,7 @@
 
 <h1>Ваши объявления</h1>
 <p>
-    <a asp-action="Create">Создать новое объявление</a>
+    <a asp-action="Create" class="btn btn-success">Создать новое объявление</a>
 </p>
 
 @await Html.PartialAsync("~/Views/Advertisements/SearchForm.cshtml")
@@ -42,6 +42,7 @@
     <input type="submit" value="Поиск" class="btn btn-success" />
     <a action="Index" asp-route-advertisementStatus="2" class="btn btn-success">На модерации</a>
     <a action="Index" asp-route-advertisementStatus="3" class="btn btn-success">К оплате</a>
+    <a action="Index" asp-route-advertisementStatus="5" class="btn btn-success">Активные</a>
 </form>
 <br />
 <paging total-records="@ViewBag.TotalRecords"
@@ -63,6 +64,9 @@
                    asp-route-advertisementStatus=@ViewBag.advertisementStatus
                    asp-route-pointId=@ViewBag.pointId
                    asp-route-price=@ViewBag.price>@Html.DisplayNameFor(model => model.AdNumber)</a>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ApplicationUser.UserName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Duration)
@@ -98,63 +102,69 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AdvertisementStatus.NameRu)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AdNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Duration)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DurationInDays)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreateDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.StartDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EndDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Price)
-                </td>
-                <td>
-                    @if (item.AdvertisementStatus.Name == "ForPayment")
-                    {
-                        <a asp-action="Payment" asp-route-id="@item.Id">Оплата наличными</a>
-                    }
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Изменить</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Детали</a> |
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdvertisementStatus.NameRu)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ApplicationUser.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Duration)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DurationInDays)
+            </td>
+            <td>
+                @*@Html.DisplayFor(modelItem => item.CreateDate)*@
+                @item.CreateDate.ToString("dd.MM.yyyy HH:mm")
+            </td>
+            <td>
+                @*@Html.DisplayFor(modelItem => item.StartDate.ToString("dd.MM.yyyy HH:mm"))*@
+                @item.StartDate.ToString("dd.MM.yyyy HH:mm")
+            </td>
+            <td>
+                @*@Html.DisplayFor(modelItem => item.EndDate)*@
+                @item.EndDate.ToString("dd.MM.yyyy HH:mm")
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @if (item.AdvertisementStatus.Name == "ForPayment")
+                {
+                    <a asp-action="Payment" asp-route-id="@item.Id">Оплата наличными</a>
+                }
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Изменить</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Детали</a> |
 
-                    @switch (item.AdvertisementStatus.Name)
-                    {
-                        case "InModeration":
-                            <a asp-action="Moderate" asp-route-id="@item.Id">Модерация</a><span>|</span>
-                            break;
-                            @*case "ForPayment":
-                                <a asp-action="Payment" asp-route-id="@item.Id">Оплата наличными</a><span>|</span>
-                                break;*@
-                    }
+                @switch (item.AdvertisementStatus.Name)
+                {
+                    case "InModeration":
+                        <a asp-action="Moderate" asp-route-id="@item.Id">Модерация</a><span>|</span>
+                        break;
+                        @*case "ForPayment":
+                    <a asp-action="Payment" asp-route-id="@item.Id">Оплата наличными</a><span>|</span>
+                    break;*@
+                }
 
-                    @*@if (item.AdvertisementStatus.Name == "InModeration")
-                        {
-                            <a asp-action="Moderate" asp-route-id="@item.Id">Модерация</a><span>|</span>
-                        }
-                    *@
+                @*@if (item.AdvertisementStatus.Name == "InModeration")
+            {
+                <a asp-action="Moderate" asp-route-id="@item.Id">Модерация</a><span>|</span>
+            }
+                *@
 
-                    <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
-                </td>
-            </tr>
+                <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+            </td>
+        </tr>
         }
     </tbody>
 </table>

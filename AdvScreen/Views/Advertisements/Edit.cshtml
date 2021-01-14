@@ -199,6 +199,18 @@
                     return false;
                 }
             });
+
+
+            $("#form").on('submit', function (e) {
+                // validation code here
+                if ($('#radioPhoto').is(':checked') &&
+                    ($('#uploadedFile').get(0).files.length === 0)
+                    ) {
+                    alert("Выберите изображение для сохранения или выберите другой тип объявления!");
+                    e.preventDefault();
+                }
+            });
+
         });
     </script>
 }

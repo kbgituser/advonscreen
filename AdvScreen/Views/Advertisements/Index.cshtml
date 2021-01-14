@@ -58,13 +58,16 @@
                 @Html.DisplayFor(modelItem => item.DurationInDays)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CreateDate)
+                @*@Html.DisplayFor(modelItem => item.CreateDate)*@
+                @item.CreateDate.ToString("dd.MM.yyyy HH:mm")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
+                @*@Html.DisplayFor(modelItem => item.StartDate.ToString("dd.MM.yyyy HH:mm"))*@
+                @item.StartDate.ToString("dd.MM.yyyy HH:mm")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
+                @*@Html.DisplayFor(modelItem => item.EndDate)*@
+                @item.EndDate.ToString("dd.MM.yyyy HH:mm")
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
@@ -73,7 +76,7 @@
                 @Html.DisplayFor(modelItem => item.Price)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Изменить</a> |                
+                <a asp-action="Edit" asp-route-id="@item.Id">Изменить</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
             </td>
         </tr>

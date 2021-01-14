@@ -52,6 +52,34 @@ namespace AdvScreen.Controllers
             return View(users);
         }
 
+        public ActionResult ChangePassword(string Id)
+        {
+            return View(model:Id);
+        }
+        
+        [HttpPost]
+        public async Task <ActionResult> ChangePassword(string userId, string password)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await UserManager.FindByIdAsync(userId);
+                var token = await UserManager.GeneratePasswordResetTokenAsync(user);
+                var result = await UserManager.ResetPasswordAsync(user, token, password);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
+            }
+            return View(userId);
+        }
+
         // GET: Users/Details/5
         public ActionResult Details(string id)
         {

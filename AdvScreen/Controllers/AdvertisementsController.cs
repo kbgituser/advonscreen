@@ -99,7 +99,7 @@ namespace AdvScreen.Controllers
             
             if (await _userManager.IsInRoleAsync(CurrentUser, "Admin") || await _userManager.IsInRoleAsync(CurrentUser, "Moderator"))
             {
-                advertisements = advertisements.Include(a => a.AdvertisementStatus);
+                advertisements = advertisements.Include(a => a.AdvertisementStatus).Include(a=>a.ApplicationUser);
                 //return View("IndexAdmin",  advertisements.Include(a=>a.AdvertisementStatus).AsQueryable());
             }
             else
@@ -167,16 +167,24 @@ namespace AdvScreen.Controllers
         }
 
         // GET: Advertisements/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             if (!_context.PointPrices.Any())
             {
                 TempData["Message"] = "Цены точек не определены в справочнике";
                 return RedirectToAction("ErrorHandle", "Home");
             }
-            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs, "Seconds", "Name");
+            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs.OrderBy(s=>s.Seconds), "Seconds", "Name");
+
+            //var currentUser = GetCurrentUser();
+            //if (await _userManager.IsInRoleAsync(currentUser, "Admin"))
+            //{
+            //    List<SecondsForAdv> secondsForAdvs = getSeconds();                
+            //    ViewData["Seconds"] = new SelectList(secondsForAdvs, "Seconds", "Name");
+            //}
+
             ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
-            ViewData["Points"] = new SelectList(_context.Points, "Id", "Name");
+            ViewData["Points"] = new SelectList(_context.Points.Where(p=>p.TurnedOn) , "Id", "Name");
             return View();
         }
 
@@ -187,9 +195,9 @@ namespace AdvScreen.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Duration,DurationInDays,Title,Text,PointId,AdvertisementType")] Advertisement advertisement)
         {
-            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs, "Seconds", "Name");
+            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs.OrderBy(s=>s.Seconds), "Seconds", "Name");
             ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
-            ViewData["Points"] = new SelectList(_context.Points, "Id", "Name");
+            ViewData["Points"] = new SelectList(_context.Points.Where(p=>p.TurnedOn), "Id", "Name");
             if (ModelState.IsValid)
             {
                 if (!_context.PointPrices.Any())
@@ -222,10 +230,7 @@ namespace AdvScreen.Controllers
                 //await _context.SaveChangesAsync();
                 
                 return RedirectToAction(nameof(Edit),new { id = advertisement.Id});
-            }
-            //ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs, "Seconds", "Name");
-            //ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
-            //ViewData["Points"] = new SelectList(_context.Points, "Id", "Name");
+            }            
             return View(advertisement);
         }
 
@@ -302,7 +307,7 @@ namespace AdvScreen.Controllers
             {
                 return NotFound();
             }
-            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs, "Seconds", "Name");
+            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs.OrderBy(s=>s.Seconds), "Seconds", "Name");
             ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
             ViewData["Points"] = new SelectList(_context.Points, "Id", "Name");
             return View(advertisement);
@@ -407,16 +412,28 @@ namespace AdvScreen.Controllers
             {
                 return NotFound();
             }
-            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs, "Seconds", "Name");
+            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs.OrderBy(s=>s.Seconds), "Seconds", "Name");
             ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
-            ViewData["Points"] = new SelectList(_context.Points, "Id", "Name");
+            ViewData["Points"] = new SelectList(_context.Points.Where(p=>p.TurnedOn==true) , "Id", "Name");
 
             ApplicationUser CurrentUser = GetCurrentUser();
+
             if (await _userManager.IsInRoleAsync(CurrentUser, "Admin"))
             {
                 return View("EditAdmin", advertisement);
             }
             return View(advertisement);
+        }
+
+        public List<SecondsForAdv> getSeconds()
+        {
+            List<SecondsForAdv> secondsForAdvs = new List<SecondsForAdv>();
+            for (int i = 10; i <= 120; i = i + 10)
+            {
+                secondsForAdvs.Add(new SecondsForAdv() { Seconds = i, Name = i.ToString()+ " сек" });
+            }            
+            
+            return secondsForAdvs;
         }
 
         //public async Task<IActionResult> HtmlToPng(Advertisement model)
@@ -452,9 +469,9 @@ namespace AdvScreen.Controllers
             {
                 return NotFound();
             }
-            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs, "Seconds", "Name");
+            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs.OrderBy(s=>s.Seconds), "Seconds", "Name");
             ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
-            ViewData["Points"] = new SelectList(_context.Points, "Id", "Name");
+            ViewData["Points"] = new SelectList(_context.Points.Where(p=>p.TurnedOn), "Id", "Name");
 
             if (ModelState.IsValid)
             {
@@ -644,10 +661,9 @@ namespace AdvScreen.Controllers
                 return NotFound();
             }
             
-            string curFilePath = _env.WebRootPath + advertisement.ImagePath;
-            if (System.IO.File.Exists(curFilePath))
-            {
-                System.IO.File.Delete(curFilePath);
+            if ((advertisement.AdvertisementStatus.Name) == AdvertisementStatusEnum.Active.ToString())
+                    {
+                return RedirectToAction("Index");
             }
 
             return View(advertisement);
@@ -659,6 +675,13 @@ namespace AdvScreen.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var advertisement = await _context.Advertisements.FindAsync(id);
+
+            string curFilePath = _env.WebRootPath + advertisement.ImagePath;
+            if (System.IO.File.Exists(curFilePath))
+            {
+                System.IO.File.Delete(curFilePath);
+            }
+
             _context.Advertisements.Remove(advertisement);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -684,7 +707,8 @@ namespace AdvScreen.Controllers
 
             return null;
         }
-
+        
+        [AllowAnonymous]
         public async Task<IActionResult> FinishAdvertisements()
         {
             var activeAdvertisementsToFinish = _context.Advertisements.Where(a => a.AdvertisementStatus.Name == "Active" && a.EndDate <= DateTime.Now).Include(a=>a.AdvertisementStatus);
@@ -712,16 +736,13 @@ namespace AdvScreen.Controllers
             _context.SaveChangesAsync();
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> MakeWaitingAdsActive()
         {
             int pointId;
             int count = 0;
             AdvertisementStatus activeStatus;
             activeStatus = _context.AdvertisementStatuses.SingleOrDefault(a => a.Name == AdvertisementStatusEnum.Active.ToString());
-
-            string test2 = AdvertisementStatusEnum.Waiting.ToString();
-            var test = _context.Advertisements.Where(a =>
-                a.AdvertisementStatus.Name == AdvertisementStatusEnum.Waiting.ToString()).ToList();
 
             foreach (var point in _context.Points.ToList())
             {

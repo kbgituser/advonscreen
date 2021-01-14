@@ -49,8 +49,7 @@ namespace AdvScreen.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
-            [Phone]
+            [Required(ErrorMessage = "Введите номер телефона")]            
             [Display(Name = "Телефон")]
             [DataType(DataType.PhoneNumber)]
             [RegularExpression(@"^\(?([0-9]{1})\)?[-. ]?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Номер телефона введен некорректно!")]
