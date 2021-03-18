@@ -21,10 +21,20 @@
     <Compile Remove="Data\Migrations\20201113125744_advertisementStatusId.Designer.cs" />
     <Compile Remove="Data\Migrations\20201113130606_advertisementStatusId.cs" />
     <Compile Remove="Data\Migrations\20201113130606_advertisementStatusId.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210216130443_userpoints.cs" />
+    <Compile Remove="Data\Migrations\20210216130443_userpoints.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210216131609_userpoints2.cs" />
+    <Compile Remove="Data\Migrations\20210216131609_userpoints2.Designer.cs" />
+    <Compile Remove="Data\Migrations\20210216131805_userpoints2.cs" />
+    <Compile Remove="Data\Migrations\20210216131805_userpoints2.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.8" />
   </ItemGroup>
 

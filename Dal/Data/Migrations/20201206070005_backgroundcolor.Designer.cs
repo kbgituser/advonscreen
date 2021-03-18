@@ -4,14 +4,16 @@ using Dal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Dal.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201206070005_backgroundcolor")]
+    partial class backgroundcolor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,14 +34,14 @@ namespace Dal.Data.Migrations
                     b.Property<int>("AdvertisementStatusId")
                         .HasColumnType("int");
 
-                    b.Property<int>("AdvertisementType")
-                        .HasColumnType("int");
-
                     b.Property<string>("BackgroundColor")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("DataUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Duration")
                         .HasColumnType("int");
@@ -52,9 +54,6 @@ namespace Dal.Data.Migrations
 
                     b.Property<int>("FontSize")
                         .HasColumnType("int");
-
-                    b.Property<string>("ImagePath")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PointId")
                         .HasColumnType("int");
@@ -74,9 +73,6 @@ namespace Dal.Data.Migrations
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Video")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -354,28 +350,6 @@ namespace Dal.Data.Migrations
                     b.ToTable("SecondsForAdvs");
                 });
 
-            modelBuilder.Entity("Dal.Models.UserPoint", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("PointId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PointId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserPoints");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -546,7 +520,7 @@ namespace Dal.Data.Migrations
             modelBuilder.Entity("Dal.Models.Payment", b =>
                 {
                     b.HasOne("Dal.Models.Advertisement", "Advertisement")
-                        .WithMany("Payments")
+                        .WithMany()
                         .HasForeignKey("AdvertisementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -559,20 +533,6 @@ namespace Dal.Data.Migrations
                         .HasForeignKey("PointId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Dal.Models.UserPoint", b =>
-                {
-                    b.HasOne("Dal.Models.Point", "Point")
-                        .WithMany()
-                        .HasForeignKey("PointId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dal.Models.ApplicationUser", "User")
-                        .WithMany("UserPoints")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

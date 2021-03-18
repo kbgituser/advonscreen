@@ -87,3 +87,9 @@ http://www.saam.kz/
 Найти работу парттайм 
 видео как грузить с гугл драйв 
 Заявка на бастау +
+
+
+Привет всем. Ребята технари, может кто сталкивался с такой задачей. 
+Я хочу выводить видео ролики на андроид приложение.
+
+https://github.com/adamfisher/Xamarin.Forms.VideoPlayer/blob/master/GettingStarted.md

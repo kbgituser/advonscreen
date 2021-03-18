@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             BackgroundColor="Black"
+             NavigationPage.HasNavigationBar="False"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"              
+             x:Class="Starter.VideoPage3"
+             xmlns:video="clr-namespace:Xam.Forms.VideoPlayer;assembly=Xam.Forms.VideoPlayer"
+             >
+
+    
+
+        <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Rotation="45">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <video:VideoPlayer Grid.Row="0" x:Name="videoPlayer"
+                BackgroundColor="{StaticResource BackColor}"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="FillAndExpand"
+                AutoPlay="True"
+                           
+                           />
+        
+    </Grid>
+</ContentPage>

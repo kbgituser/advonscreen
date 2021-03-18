@@ -25,6 +25,7 @@ namespace Dal.Data
         public DbSet<SecondsForAdv> SecondsForAdvs { get; set; }
         public DbSet<DaysForAdv> DaysForAdvs { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<UserPoint> UserPoints { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -34,6 +35,8 @@ namespace Dal.Data
                 .HasForeignKey(o => o.UserId)
                 .IsRequired()
                 ;
+
+
             builder.Entity<Advertisement>()
                 .HasOne(r => r.AdvertisementStatus)
                 .WithMany(u => u.Advertisements)
@@ -41,6 +44,16 @@ namespace Dal.Data
                 .OnDelete(DeleteBehavior.NoAction)
                 ;
 
+
+
+            //builder.Entity<UserPoint>().HasKey(sc => new { sc.UserId, sc.PointId });
+
+            builder.Entity<UserPoint>()
+                .HasOne<ApplicationUser>(sc => sc.User)
+                .WithMany(s => s.UserPoints)
+                .HasForeignKey(sc => sc.UserId)
+                .OnDelete(DeleteBehavior.NoAction)
+                ;
         }
     }
 }

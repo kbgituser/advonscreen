@@ -192,6 +192,8 @@
                 $("#partPhoto").hide();
                 $("#partVideo").hide();
                 $("#part" + test).removeClass("d-none").show();
+                Scale();
+                e.preventDefault(); 
             });
 
             $("#sendToModerate").click(function () {
@@ -203,6 +205,45 @@
                     return false;
                 }
             });
+
+            function Scale() {
+                var swidth = $('#screenEmulator').outerWidth();
+                var sheight = $('#screenEmulator').height();
+                var owidth = $('#outerScreen').outerWidth();
+                var koef = owidth / swidth * 0.7;
+                koef = Math.round(koef * 100) / 100;
+                $('#screenEmulator').css('transform', 'scale(' + koef + ')');
+
+                var newkwidth = swidth * koef + 10;
+                $('#wrapScreen').css("width", newkwidth);
+                var newkheight = sheight * koef + 10;
+                $('#wrapScreen').css("height", newkheight);
+
+                var iwidth = $('#image').width();
+                var iheight = $('#image').height();
+                owidth = $('#outerImage').width();
+                koef = owidth / iwidth * 0.7;
+                koef = Math.round(koef * 100) / 100;
+
+
+                $('#image').css('transform', 'scale(' + koef + ')');
+
+
+                newkwidth = iwidth * koef + 10;
+                $('#wrapImage').css("width", newkwidth);
+                newkheight = iheight * koef + 10;
+                $('#wrapImage').css("height", newkheight);
+                
+            }
+
+            $(document).ready(function () {
+                Scale();
+            });
+
+            $(window).resize(function () {
+                Scale();
+            });
+
         });
     </script>
 }
@@ -331,9 +372,9 @@
                         <span asp-validation-for="Text" class="text-danger"></span>
                         <input type="submit" value="Сохранить" class="btn btn-primary" @*onclick="return FormSubmit();"*@ />
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" id="outerScreen">
                         <div class="text-center text-info">Так будет выглядеть текст на экране</div>                        
-                        <div class="wrap">
+                        <div class="wrap" id="wrapScreen">
                             <div class="PointScreen" style="font-size: @(Model.FontSize+"px");" id="screenEmulator">
                                 @Html.Raw(Model.Text)
                             </div>
@@ -348,9 +389,9 @@
 
                 <input type="file" id="uploadedFile" name="uploadedFile" style="display: none">
                 <label for="uploadedFile" class="btn btn-primary  btn-outlined">Выберите изображение</label>
-                <div>
+                <div id="outerImage">
                     <div class="text-center text-info">Так будет выглядеть изображение на экране</div>
-                    <div class="wrap">
+                    <div class="wrap" id="wrapImage">
                         <img id="image" src=@Model.ImagePath
                              class="PointImage" />
                     </div>

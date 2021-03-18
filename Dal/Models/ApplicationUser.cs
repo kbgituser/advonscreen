@@ -22,5 +22,7 @@ namespace Dal.Models
         public DateTime CreateDate { get; set; }
         public bool Blocked { get; set; }
         public virtual ICollection<Advertisement> Advertisements { get; set; }
+
+        public virtual ICollection<UserPoint> UserPoints { get; set; }
     }
 }

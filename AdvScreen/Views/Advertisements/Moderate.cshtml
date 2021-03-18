@@ -1,10 +1,49 @@
 ﻿@Html.Partial("SharedEdit.cshtml")
-
 @model Dal.Models.Advertisement
-
 @{
-    ViewData["Title"] = "Изменить объявление";
+    ViewData["Title"] = "Модерация";
     Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Scripts {
+    <script>
+        $(function () {
+            function Scale()
+            {
+                var swidth = $('#screenEmulator').outerWidth();
+                var sheight = $('#screenEmulator').height();
+                var owidth = $('#outerScreen').outerWidth();
+                var koef = owidth / swidth ;
+                koef = Math.round(koef * 100) / 100;
+                $('#screenEmulator').css('transform', 'scale(' + koef + ')');
+
+                var newkwidth = swidth * koef +10;
+                $('#wrapScreen').css("width", newkwidth);
+                var newkheight = sheight * koef + 10;
+                $('#wrapScreen').css("height", newkheight);
+
+                var iwidth = $('#image').width();
+                var iheight = $('#image').height();
+                owidth = $('#outerImage').width();
+                koef = owidth / iwidth;
+                koef = Math.round(koef * 100) / 100;
+
+                $('#image').css('transform', 'scale(' + koef + ')');
+
+                newkwidth = iwidth * koef + 10;
+                $('#wrapImage').css("width", newkwidth);
+                newkheight = iheight * koef + 10;
+                $('#wrapImage').css("height", newkheight);
+            }
+
+            $(document).ready(function () {
+                Scale();
+            });
+
+            $(window).resize(function () {
+                Scale();
+            });
+        });
+    </script>
 }
 
 <div class="row">
@@ -13,88 +52,84 @@
 </div>
 <hr />
 <div class="row" style="border: 1px solid;">
-    <div class="col-md-6" style="border: 1px dotted;">        
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            
-            <div class="form-group text-center">                
-                <a asp-controller="Advertisements" asp-action="RefuseModeration" asp-route-id=@Model.Id class="btn btn-primary"><< Вернуть пользователю</a>
-                <a asp-controller="Advertisements" asp-action="PassModeration" asp-route-id=@Model.Id class="btn btn-primary">Одобрить к оплате >></a>
+    <div class="col-md-6" style="border: 1px dotted;">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group text-center">
+            <a asp-controller="Advertisements" asp-action="RefuseModeration" asp-route-id=@Model.Id class="btn btn-primary"><< Вернуть пользователю</a>
+            <a asp-controller="Advertisements" asp-action="PassModeration" asp-route-id=@Model.Id class="btn btn-primary">Одобрить к оплате >></a>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Title" class="control-label"></label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label asp-for="PointId" class="control-label">Место объявления</label>
+                <select asp-for="PointId" class="form-control" asp-items="ViewBag.Points"></select>
+                <span asp-validation-for="PointId" class="text-danger"></span>
             </div>
-            
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+
+            <div class="form-group col-md-6">
+                <label asp-for="Duration" class="control-label">Длительность в сек</label>
+                <select asp-for="Duration" class="form-control" asp-items="ViewBag.Seconds"></select>
+                <span asp-validation-for="Duration" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="DurationInDays" class="control-label">Количество дней</label>
+                <select asp-for="DurationInDays" class="form-control" asp-items="ViewBag.Days"></select>
+                <span asp-validation-for="DurationInDays" class="text-danger"></span>
             </div>
 
-            <div class="row">
-                <div class="form-group col-md-6">
-                    <label asp-for="PointId" class="control-label">Место объявления</label>
-                    <select asp-for="PointId" class="form-control" asp-items="ViewBag.Points"></select>
-                    <span asp-validation-for="PointId" class="text-danger"></span>
-                </div>
-
-                <div class="form-group col-md-6">
-                    <label asp-for="Duration" class="control-label">Длительность в сек</label>
-                    <select asp-for="Duration" class="form-control" asp-items="ViewBag.Seconds"></select>
-                    <span asp-validation-for="Duration" class="text-danger"></span>
-                </div>
-                <div class="form-group col-md-6">
-                    <label asp-for="DurationInDays" class="control-label">Количество дней</label>
-                    <select asp-for="DurationInDays" class="form-control" asp-items="ViewBag.Days"></select>
-                    <span asp-validation-for="DurationInDays" class="text-danger"></span>
-                </div>
-
-                <div class="form-group col-md-6">
-                    <label asp-for="FontSize" class="control-label"></label>
-                    <input asp-for="FontSize" class="form-control" />
-                    <span asp-validation-for="FontSize" class="text-danger"></span>
-                </div>
-
-                <div class="form-group col-md-6">
-                    <label asp-for="AdNumber" class="control-label"></label>
-                    <input asp-for="AdNumber" class="form-control" disabled="disabled" />
-                    <span asp-validation-for="AdNumber" class="text-danger"></span>
-                </div>
-
-                <div class="form-group col-md-6">
-                    <label asp-for="AdvertisementType" class="control-label"></label>
-                    <input asp-for="AdvertisementType" class="form-control" disabled="disabled" />
-                    <span asp-validation-for="AdvertisementType" class="text-danger"></span>
-                </div>
+            <div class="form-group col-md-6">
+                <label asp-for="FontSize" class="control-label"></label>
+                <input asp-for="FontSize" class="form-control" />
+                <span asp-validation-for="FontSize" class="text-danger"></span>
             </div>
+
+            <div class="form-group col-md-6">
+                <label asp-for="AdNumber" class="control-label"></label>
+                <input asp-for="AdNumber" class="form-control" disabled="disabled" />
+                <span asp-validation-for="AdNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label asp-for="AdvertisementType" class="control-label"></label>
+                <input asp-for="AdvertisementType" class="form-control" disabled="disabled" />
+                <span asp-validation-for="AdvertisementType" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 
     <div class="col-md-6">
         @if (Model.AdvertisementType == Dal.Models.AdvertisementType.Text)
         {
-        <div class="text-center text-info">Так будет выглядеть текст на экране</div>
-        <div class="wrap">
-            <div class="PointScreen" style="font-size: @(Model.FontSize + "px");" id="screenEmulator">
-                @Html.Raw(Model.Text)
+            <div class="text-center text-info" id="outerScreen">Так будет выглядеть текст на экране</div>
+            <div class="wrap" id="wrapScreen">
+                <div class="PointScreen" style="font-size: @(Model.FontSize + "px");" id="screenEmulator">
+                    @Html.Raw(Model.Text)
+                </div>
             </div>
-        </div>
 
         }
         else if (Model.AdvertisementType == Dal.Models.AdvertisementType.Photo)
         {
-        <div class="text-center text-info">Так будет выглядеть изображение на экране</div>
-        <div class="wrap">
-            <img id="image" src=@Model.ImagePath
-                 class="PointImage" />
-        </div>
+            <div id="outerImage" class="text-center text-info">Так будет выглядеть изображение на экране</div>
+            <div class="wrap" id="wrapImage">
+                <img id="image" src=@Model.ImagePath class="PointImage" />
+            </div>
         }
         else if (Model.AdvertisementType == Dal.Models.AdvertisementType.Video)
         {
-        <div>
-            <label asp-for="Video" class="control-label"></label>
-
-            @*<input asp-for="Video" class="form-control" disabled="disabled" />*@
-            <a class="form-control" target="_blank" href="@Model.Video">@Model.Video</a>
-            <span asp-validation-for="Video" class="text-danger"></span>
-        </div>
-
+            <div>
+                <label asp-for="Video" class="control-label"></label>
+                <a class="form-control" target="_blank" href="@Model.Video">@Model.Video</a>
+                <span asp-validation-for="Video" class="text-danger"></span>
+            </div>
         }
     </div>
 </div>

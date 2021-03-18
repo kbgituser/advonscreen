@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             BackgroundColor="Black"
+             NavigationPage.HasNavigationBar="False"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Starter.VideoPage">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <MediaElement Grid.Row="0" 
+                          MediaOpened="MediaElement_MediaOpened" 
+                          x:Name="MyMediaElement"
+                          MediaFailed="MediaElement_MediaFailed"
+                          />
+        <ActivityIndicator Grid.Row="0" x:Name="MyActivityIndicator" 
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                Color="White" IsRunning="True"
+                BackgroundColor="Transparent"
+                IsVisible="False">
+        </ActivityIndicator>
+    </Grid>
+</ContentPage>

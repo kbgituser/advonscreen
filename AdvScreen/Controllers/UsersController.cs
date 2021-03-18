@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace AdvScreen.Controllers
 {
@@ -184,6 +186,42 @@ namespace AdvScreen.Controllers
                 IdentityResult result = await _userManager.DeleteAsync(user);
             }
             return RedirectToAction("Index");
+        }
+
+        public ActionResult UserPoints(string id)
+        {
+            var userPoints = _context.UserPoints.Where(u => u.UserId == id.ToString())
+                .ToList();
+            ViewBag.userId = id;
+            ViewBag.points = new SelectList(_context.Points.ToList(), "Id", "Name") ;
+
+            return View(userPoints);
+        }
+
+        public async Task<ActionResult> AddPoint(string userId, int pointId)
+        {
+            var newUserPoint = new UserPoint();
+            newUserPoint.UserId = userId;
+            newUserPoint.PointId = pointId;
+
+            if (!_context.UserPoints.Any(u => u.UserId == userId && u.PointId == pointId))
+            {
+                _context.UserPoints.Add(newUserPoint);
+                await _context.SaveChangesAsync();
+            }
+            
+            return RedirectToAction ("UserPoints", new { id = userId});
+        }
+
+        public async Task<ActionResult> RemovePoint(string userId, int pointId)
+        {
+            var delUserPoint = _context.UserPoints.FirstOrDefault(u=>u.UserId == userId && u.PointId == pointId);
+            if (delUserPoint != null)
+            {
+                _context.UserPoints.Remove(delUserPoint);
+                await _context.SaveChangesAsync();
+            }                
+            return RedirectToAction("UserPoints", new { id = userId });
         }
 
         public ActionResult CurrentUserLink()

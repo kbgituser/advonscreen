@@ -19,6 +19,7 @@ using AdvScreen.Models;
 using AdvScreen.Areas.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 
 namespace AdvScreen
 {
@@ -127,6 +128,7 @@ namespace AdvScreen
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
                 options.SlidingExpiration = true;
                 options.ExpireTimeSpan = TimeSpan.FromDays(2);      // 20 minutes logged in session timeout
+                //options.Cookie.SameSite = SameSiteMode.None;
 
             });
 

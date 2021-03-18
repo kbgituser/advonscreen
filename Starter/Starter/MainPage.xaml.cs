@@ -1,4 +1,6 @@
 ﻿using Android.Webkit;
+//using Google.Apis.Services;
+
 using Newtonsoft.Json;
 using Starter.Models;
 using System;
@@ -28,7 +30,7 @@ namespace Starter
         //string baseUri = "https://192.168.0.107:45455";
         //string baseUri = "https://10.0.2.2:45455";
         private bool _firstAppearance = true;
-
+        //VideoPage videoPage = new VideoPage();
 
 
         public MainPage()
@@ -64,10 +66,14 @@ namespace Starter
                 //uri = "https://10.0.2.2:44379/adsapi/";
 
                 cycle = new Cycle(PointId, uri);
-                cycle.onAdvChange += RefreshText;
-                cycle.Init();
+                cycle.onAdvChange += RefreshText;                
                 cycle.InternetConnected = (Connectivity.NetworkAccess == NetworkAccess.Internet);
-                cycle.StartShowAsync(); // тоже работает
+                if (cycle.InternetConnected)
+                {
+                    cycle.Init();
+                    cycle.StartShowAsync(); 
+                }
+                
             }
 
             
@@ -78,7 +84,7 @@ namespace Starter
         {
             Connected = e.NetworkAccess == NetworkAccess.Internet;
             cycle.InternetConnected= e.NetworkAccess == NetworkAccess.Internet;
-            if(cycle.InternetConnected) cycle.StartShowAsync();
+            if(cycle.InternetConnected && !cycle.Delayed) cycle.StartShowAsync();
         }
 
         void button_Clicked(object sender, EventArgs e)
@@ -97,7 +103,10 @@ namespace Starter
                     
                     if (Navigation.NavigationStack.Count > 1)
                     {
-                        Navigation.PopAsync();
+                         //Navigation.PopAsync().GetAwaiter().GetResult();
+                        //Navigation.PopAsync();
+                        //Navigation.RemovePage(Navigation.NavigationStack[1]);
+                        Navigation.PopToRootAsync();
                     }
 
                     var html = "";
@@ -172,13 +181,44 @@ namespace Starter
                     else if (cycle.CurrentAdvertisement.AdvertisementType == AdvertisementType.Video)
                     {
 
-                        if (Navigation.NavigationStack.Count < 2)
+                        try
                         {
-                            Navigation.PushAsync(new VideoPage(cycle.CurrentAdvertisement.Video));
+                            if (Navigation.NavigationStack.Count < 2)
+                            {
+                                //Navigation.PushAsync(new VideoPage(cycle.CurrentAdvertisement.Video));
+                                if (!string.IsNullOrEmpty(cycle.CurrentAdvertisement.Video))
+                                Navigation.PushAsync(new VideoPage2(cycle.CurrentAdvertisement.Video));
+                                //Navigation.PushAsync(new VideoPage3(cycle.CurrentAdvertisement.Video));
+
+                                html = "";
+                                viewSource.Html = html;
+                                webView.Source = viewSource;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            html = "<p>Неполадки с подключением. Проверьте соединение</p>";
+                            viewSource.Html = html;
+                            webView.Source = viewSource;
                         }
 
 
+
                         //webView.Source = "https://www.youtube.com/embed/rAGh8iy9YnU";
+
+
+                        //var url = cycle.CurrentAdvertisement.Video;
+                        //var uri = new Uri(url);
+                        //var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+                        //var videoId = string.Empty;
+                        //if (query.AllKeys.Contains("v"))
+                        //{
+                        //    videoId = query["v"];
+                        //}
+                        //else
+                        //{
+                        //    videoId = uri.Segments.Last();
+                        //}
 
 
                         //html += "<script>";
@@ -188,7 +228,8 @@ namespace Starter
                         //// Replace the 'ytplayer' element with an <iframe> and
                         //// YouTube player after the API code downloads.
                         //html += "var player;";
-                        //html += "function onYouTubePlayerAPIReady() {player = new YT.Player('ytplayer', { height: '360', width: '640', videoId: 'M7lc1UVf-VE'" +
+                        ////html += "function onYouTubePlayerAPIReady() {player = new YT.Player('ytplayer', { height: '" + cycle.CurrentAdvertisement.Point.Height + "', width: '" + cycle.CurrentAdvertisement.Point.Width + "', videoId: '" + videoId + "'" +
+                        //html += "function onYouTubePlayerAPIReady() {player = new YT.Player('ytplayer', { height: '" + 600 + "', width: '" + 800 + "', videoId: '" + videoId + "'" +
                         //",playerVars: {autoplay: 1,controls: 0}" +
                         //",events: {'onReady': onPlayerReady}"
                         //+ "});" +
@@ -199,13 +240,13 @@ namespace Starter
                         //html += "</script>";
                         //html += "<div id=\"ytplayer\"></div>";
 
-                        ///// <summary>
-                        ///// ////////
-                        ///// </summary>
-                        ////html += cycle.CurrentAdvertisement.Video ;
+                        /////// <summary>
+                        /////// ////////
+                        /////// </summary>
+                        //////html += cycle.CurrentAdvertisement.Video ;
 
-                        viewSource.Html = html;
-                        webView.Source = viewSource;
+                        //viewSource.Html = html;
+                        //webView.Source = viewSource;
 
 
                         //viewSource.Html = cycle.CurrentAdvertisement.Video;
@@ -224,9 +265,11 @@ namespace Starter
             });
         }
 
-        
         public async void test()
-        {                  
+        {
+
+            
+
             string url = "https://adv.kenseler.kz/adsapi1/getadvertisement/1/1";
             Uri geturi = new Uri(url);
 

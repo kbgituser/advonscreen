@@ -19,6 +19,7 @@ namespace Starter
         HttpClient client;
         WSClient wsClient;
         public bool InternetConnected;
+        public bool Delayed;
         public Cycle(int pointId, string uri)
         {
             httpClientHandler.ServerCertificateCustomValidationCallback =
@@ -80,11 +81,13 @@ namespace Starter
                 Point = GetPoint();
 
             var spareAd = new Advertisement();
+            spareAd.AdvertisementType = AdvertisementType.Text;
             spareAd.PointId = Point.Id;
             spareAd.Point = Point;
             spareAd.Text = "<div class='text-center'>На данный момент объявлений нет</div>";
             spareAd.Duration = 10;
             spareAd.FontSize = Point.RecommendedFontSize;
+            
 
             while (Point.TurnedOn)
             {
@@ -95,20 +98,29 @@ namespace Starter
                 SetNextAdvertisement(spareAd);
                 if (CurrentAdvertisement != null)
                 {
+                    Delayed = true;
                     Task.Delay(CurrentAdvertisement.Duration * 1000).Wait();
                     // даю время на загрузку
                     if (CurrentAdvertisement.AdvertisementType == AdvertisementType.Video)
                     {
-                        Task.Delay(10 * 1000).Wait();
+                        // даю время 1.1 секунду
+                        Task.Delay(1 * 1100).Wait();
                     }
                 }
                 // подумать как обновлять состояние
                 Point = GetPoint();
+                Delayed = false;
             }
             if (!Point.TurnedOn)
             {
                 advText = "Показ объявлений по техническим причинам приостановлен";
+                CurrentAdvertisement.Text = "Показ объявлений по техническим причинам приостановлен";
+                CurrentAdvertisement.AdvertisementType = AdvertisementType.Text;
+                onAdvChange();
+                Delayed = true;
                 Task.Delay(30000).Wait();
+                Point = GetPoint();
+                Delayed = false;
             }
             StartShow();
         }
@@ -151,10 +163,15 @@ namespace Starter
             {
                 //result = GetFirstAdvertisement();
                 //return wsClient.Get<Advertisement>(uriBase + "getAdvertisement/" + PointId).Result;
-                result = wsClient.Get<Advertisement>(uriBase + "getAdvertisement/" + PointId);            }
+                result = wsClient.Get<Advertisement>(uriBase + "getAdvertisement/" + PointId);
+            }
+            else if(CurrentAdvertisement.Id==0)
+            {
+                result = wsClient.Get<Advertisement>(uriBase + "getAdvertisement/" + PointId);
+            }
             else
             {
-                result = wsClient.Get<Advertisement>(uriBase + "getAdvertisement/" + PointId + "/" + CurrentAdvertisement.Id);                
+                result = wsClient.Get<Advertisement>(uriBase + "getAdvertisement/" + PointId + "/" + CurrentAdvertisement.Id);
             }
             //result = wsClient.Get<Advertisement>(uriBase + "getAdvertisement/"+PointId+"/"+CurrentAdvertisement.Id).Result;            
             return result;

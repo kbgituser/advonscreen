@@ -96,11 +96,19 @@ namespace AdvScreen.Controllers
                 curPrice = Int32.Parse(price);
                 advertisements = advertisements.Where(a => a.Price<=curPrice);                
             }
-            
-            if (await _userManager.IsInRoleAsync(CurrentUser, "Admin") || await _userManager.IsInRoleAsync(CurrentUser, "Moderator"))
+
+            if (await _userManager.IsInRoleAsync(CurrentUser, "Admin"))
             {
-                advertisements = advertisements.Include(a => a.AdvertisementStatus).Include(a=>a.ApplicationUser);
+                advertisements = advertisements.Include(a => a.AdvertisementStatus).Include(a => a.ApplicationUser);
                 //return View("IndexAdmin",  advertisements.Include(a=>a.AdvertisementStatus).AsQueryable());
+            }
+            else if (await _userManager.IsInRoleAsync(CurrentUser, "Moderator"))
+            {
+                //CurrentUser.UserPoints
+                advertisements = advertisements.Where(a => a.UserId == CurrentUser.Id).Union(
+                    advertisements.Where(a => CurrentUser.UserPoints.Select(up => up.Point).Contains(a.Point))
+                    );
+                advertisements = advertisements.Include(a => a.AdvertisementStatus).Include(a => a.ApplicationUser);
             }
             else
             {
@@ -247,7 +255,7 @@ namespace AdvScreen.Controllers
             }
 
             var currentUser = GetCurrentUser();
-            if (advertisement.ApplicationUser == currentUser || await _userManager.IsInRoleAsync (currentUser, "Admin"))
+            if (advertisement.ApplicationUser == currentUser || await _userManager.IsInRoleAsync (currentUser, "Admin") || await _userManager.IsInRoleAsync(currentUser, "Moderator"))
             {
                 advertisement.AdvertisementStatusId = _context.AdvertisementStatuses.FirstOrDefault(s => s.Name == "InModeration").Id;
                 _context.Update(advertisement);
@@ -295,7 +303,7 @@ namespace AdvScreen.Controllers
 
 
 
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles ="Admin, Moderator")]
         public async Task<IActionResult> Moderate(int? id)
         {
             if (id == null)
@@ -418,7 +426,7 @@ namespace AdvScreen.Controllers
 
             ApplicationUser CurrentUser = GetCurrentUser();
 
-            if (await _userManager.IsInRoleAsync(CurrentUser, "Admin"))
+            if (await _userManager.IsInRoleAsync(CurrentUser, "Admin") || await _userManager.IsInRoleAsync(CurrentUser, "Moderator"))
             {
                 return View("EditAdmin", advertisement);
             }
@@ -572,7 +580,7 @@ namespace AdvScreen.Controllers
 
         
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Moderator")]
         public async Task<IActionResult> Payment(int? id)
         {
             if (id == null)
@@ -585,10 +593,13 @@ namespace AdvScreen.Controllers
             {
                 return NotFound();
             }
+            ViewData["Seconds"] = new SelectList(_context.SecondsForAdvs.OrderBy(s => s.Seconds), "Seconds", "Name");
+            ViewData["Days"] = new SelectList(_context.DaysForAdvs, "Days", "Name");
+            ViewData["Points"] = new SelectList(_context.Points, "Id", "Name");
             return View(advertisement);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Moderator")]
         public async Task<IActionResult> PaymentConfirmed(int? id, bool wait)
         {
             if (id == null)

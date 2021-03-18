@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Dal.Models.UserPoint>
+
+@{
+    ViewData["Title"] = "Точки модератора";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form action="@Url.Action("AddPoint", "Users")">
+    <input hidden="hidden" name="userId" value="@ViewBag.userId" />
+    <select name="pointId" class="form-control" asp-items="ViewBag.points">
+    </select>
+    <button type="submit">Добавить точку</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Point)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.UserName)
+                @*@Html.DisplayFor(modelItem => item.User.Id)*@
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Point.Name)
+            </td>
+            <td>
+                
+                <a asp-action="RemovePoint" asp-route-userId="@item.UserId" asp-route-pointId="@item.PointId">Удалить</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

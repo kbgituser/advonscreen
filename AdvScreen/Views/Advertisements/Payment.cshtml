@@ -1,39 +1,134 @@
-﻿@model Dal.Models.Advertisement
+﻿@Html.Partial("SharedEdit.cshtml")
+
+@model Dal.Models.Advertisement
 
 @{
     ViewData["Title"] = "Оплата";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<style>
-    .PointImage {
-        height: @(Model.Point.Height+"px");
-        width: @(Model.Point.Width+"px");
-        transform-origin: 0 0;
-        transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) );
-        border: 6px solid;
-        white-space: normal;
-        overflow: hidden;
-        background-position: center center;
-        background-repeat: no-repeat;
-        object-fit: contain;
-    }
+@*<style>
+        .PointImage {
+            height: @(Model.Point.Height+"px");
+            width: @(Model.Point.Width+"px");
+            transform-origin: 0 0;
+            transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) );
+            border: 6px solid;
+            white-space: normal;
+            overflow: hidden;
+            background-position: center center;
+            background-repeat: no-repeat;
+            object-fit: contain;
+        }
 
-    .wrap {
-        height: @(Math.Ceiling(Model.Point.Height * Model.Point.Scale) + 6+ "px");
-        width: @(Math.Ceiling(Model.Point.Width * Model.Point.Scale) + 5+"px");
-        overflow: hidden;
-        margin-left: auto;
-        margin-right: auto;
-    }
+        .wrap {
+            height: @(Math.Ceiling(Model.Point.Height * Model.Point.Scale) + 6+ "px");
+            width: @(Math.Ceiling(Model.Point.Width * Model.Point.Scale) + 5+"px");
+            overflow: hidden;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-    .center {
-        margin-left: auto;
-        margin-right: auto;
-    }
-</style>
+        .center {
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>*@
 
-<div>
+<div class="row">
+    <h4 class="col-md-4">@ViewData["Title"]</h4>
+    <h4 class="col-md-6"><a asp-action="Index">Мои объявления</a></h4>
+    <h4 class="text-danger text-center">@TempData["Message"]</h4>
+</div>
+<hr />
+
+<div class="row" style="border: 1px solid;">    
+    <div class="col-md-6" style="border: 1px dotted;">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group text-center">            
+            <a asp-action="PaymentConfirmed" asp-route-id="@Model.Id">Зачисление оплаты</a> |
+            <a asp-action="PaymentConfirmed" asp-route-id="@Model.Id" asp-route-wait="true">Зачисление оплаты и в очередь</a> |
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Title" class="control-label"></label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label asp-for="PointId" class="control-label">Место объявления</label>
+                <select asp-for="PointId" class="form-control" asp-items="ViewBag.Points" disabled="disabled"></select>
+                <span asp-validation-for="PointId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label asp-for="Duration" class="control-label">Длительность в сек</label>
+                <select asp-for="Duration" class="form-control" asp-items="ViewBag.Seconds" disabled="disabled"></select>
+                <span asp-validation-for="Duration" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="DurationInDays" class="control-label">Количество дней</label>
+                <select asp-for="DurationInDays" class="form-control" asp-items="ViewBag.Days" disabled="disabled"></select>
+                <span asp-validation-for="DurationInDays" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label asp-for="FontSize" class="control-label"></label>
+                <input asp-for="FontSize" class="form-control" disabled="disabled"/>
+                <span asp-validation-for="FontSize" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label asp-for="AdNumber" class="control-label"></label>
+                <input asp-for="AdNumber" class="form-control" disabled="disabled" />
+                <span asp-validation-for="AdNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label asp-for="AdvertisementType" class="control-label"></label>
+                <input asp-for="AdvertisementType" class="form-control" disabled="disabled" />
+                <span asp-validation-for="AdvertisementType" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        @if (Model.AdvertisementType == Dal.Models.AdvertisementType.Text)
+        {
+            <div class="text-center text-info">Так будет выглядеть текст на экране</div>
+            <div class="wrap">
+                <div class="PointScreen" style="font-size: @(Model.FontSize + "px");" id="screenEmulator">
+                    @Html.Raw(Model.Text)
+                </div>
+            </div>
+        }
+        else if (Model.AdvertisementType == Dal.Models.AdvertisementType.Photo)
+        {
+            <div class="text-center text-info">Так будет выглядеть изображение на экране</div>
+            <div class="wrap">
+                <img id="image" src=@Model.ImagePath
+                     class="PointImage" />
+            </div>
+        }
+        else if (Model.AdvertisementType == Dal.Models.AdvertisementType.Video)
+        {
+            <div>
+                <label asp-for="Video" class="control-label"></label>
+                @*<input asp-for="Video" class="form-control" disabled="disabled" />*@
+                <a class="form-control" target="_blank" href="@Model.Video">@Model.Video</a>
+                <span asp-validation-for="Video" class="text-danger"></span>
+            </div>
+
+        }
+    </div>
+</div>
+
+
+<!--<div>
     <h4>@ViewData["Title"]</h4>
     <h4 class="text-danger text-center">@TempData["Message"]</h4>
     <hr />
@@ -74,9 +169,9 @@
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Text)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-10">-->
             @*@Html.DisplayFor(model => model.Text)*@
-            @Html.Raw(Model.Text)
+            <!--@Html.Raw(Model.Text)
         </dd>
 
 
@@ -104,10 +199,10 @@
 <div class="wrap">
     <img id="image" src=@Model.ImagePath
          class="PointImage" />
-</div>
+</div>-->
 
 <div>
-    <a asp-action="Index">К списку объявлений</a> |
+    @*<a asp-action="Index">К списку объявлений</a> |*@
     <a asp-action="PaymentConfirmed" asp-route-id="@Model.Id">Зачисление оплаты</a> |
     <a asp-action="PaymentConfirmed" asp-route-id="@Model.Id" asp-route-wait="true">Зачисление оплаты и в очередь</a> |
 </div>

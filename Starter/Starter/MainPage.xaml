@@ -3,11 +3,12 @@
              NavigationPage.HasNavigationBar="False"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:Starter"
-             x:Class="Starter.MainPage">
+             x:Class="Starter.MainPage"
+             
+             >
+    
 
-  
-
-    <StackLayout>
+    <StackLayout Orientation="Vertical">
         <!--<StackLayout Orientation="Horizontal">
             <Button Text="Go" Clicked="button_Clicked" />
             <Entry x:Name="urlEntry" HorizontalOptions="FillAndExpand" />
