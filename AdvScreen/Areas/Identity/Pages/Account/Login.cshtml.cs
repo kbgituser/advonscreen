@@ -100,9 +100,15 @@ namespace AdvScreen.Areas.Identity.Pages.Account
                         var authProps = new AuthenticationProperties
                         {
                             IsPersistent = Input.RememberMe,
-                            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(2)                            
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(2)
+                            
                         };
-                        await _signInManager.SignInAsync(user, authProps);
+
+
+
+                        //await _signInManager.SignInAsync(user, authProps);
+                        await _signInManager.SignInAsync(user, Input.RememberMe);
+
                         //await _signInManager.SignInAsync(user, true);
                         return LocalRedirect(returnUrl);
                     }

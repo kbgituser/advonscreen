@@ -60,6 +60,7 @@ namespace AdvScreen
             services
               //.AddDefaultIdentity<ApplicationUser>()
               .AddIdentity<ApplicationUser, IdentityRole>() //(options => options.SignIn.RequireConfirmedAccount = true) 
+              
               .AddEntityFrameworkStores<ApplicationDbContext>()
               .AddErrorDescriber<RussianIdentityErrorDescriber>()
               .AddDefaultUI()
@@ -85,7 +86,12 @@ namespace AdvScreen
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
+                    options.LoginPath = "/Identity/Account/Login";
+                    options.AccessDeniedPath = "/Identity/Account/Logout";
+                    options.Cookie.IsEssential = true;
+                    options.SlidingExpiration = true; // here 1                    
                     options.Cookie.Expiration = TimeSpan.FromHours(48);
+                    
                 });
 
 
@@ -121,12 +127,13 @@ namespace AdvScreen
             services.ConfigureApplicationCookie(options =>
             {
                 // Cookie settings
-                //options.Cookie.HttpOnly = true;
+                options.Cookie.HttpOnly = true;
                
                 options.LoginPath = "/Identity/Account/Login"; // If the LoginPath is not set here, ASP.NET Core will default to /Account/Login
                 options.LogoutPath = "/Identity/Account/Logout"; // If the LogoutPath is not set here, ASP.NET Core will default to /Account/Logout
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
                 options.SlidingExpiration = true;
+                
                 options.ExpireTimeSpan = TimeSpan.FromDays(2);      // 20 minutes logged in session timeout
                 //options.Cookie.SameSite = SameSiteMode.None;
 
@@ -142,6 +149,14 @@ namespace AdvScreen
             //    options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
 
             //});
+
+            //services.AddDistributedMemoryCache();
+            //services.AddSession(options => {
+            //    options.IdleTimeout = TimeSpan.FromDays(2);
+            //    options.Cookie.IsEssential = true;
+            //});
+
+            
 
             services.AddControllersWithViews();
             services.AddRazorPages();
@@ -179,7 +194,7 @@ namespace AdvScreen
             app.UseAuthentication();
             app.UseAuthorization();
 
-            
+            //app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {
