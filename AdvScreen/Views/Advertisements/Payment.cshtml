@@ -1,40 +1,54 @@
 ﻿@Html.Partial("SharedEdit.cshtml")
-
 @model Dal.Models.Advertisement
-
 @{
     ViewData["Title"] = "Оплата";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@section Scripts {
+    <script>
+        $(function () {
+            function Scale()
+            {
+                var swidth = $('#screenEmulator').outerWidth();
+                var sheight = $('#screenEmulator').height();
+                var owidth = $('#outerScreen').outerWidth();
+                var koef = owidth / swidth;
+                koef = Math.round(koef * 100) / 100;
+                $('#screenEmulator').css('transform', 'scale(' + koef + ')');
 
-@*<style>
-        .PointImage {
-            height: @(Model.Point.Height+"px");
-            width: @(Model.Point.Width+"px");
-            transform-origin: 0 0;
-            transform: scale( @Model.Point.Scale.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) );
-            border: 6px solid;
-            white-space: normal;
-            overflow: hidden;
-            background-position: center center;
-            background-repeat: no-repeat;
-            object-fit: contain;
-        }
+                var newkwidth = swidth * koef + 10;
+                $('#wrapScreen').css("width", newkwidth);
+                var newkheight = sheight * koef + 10;
+                $('#wrapScreen').css("height", newkheight);
 
-        .wrap {
-            height: @(Math.Ceiling(Model.Point.Height * Model.Point.Scale) + 6+ "px");
-            width: @(Math.Ceiling(Model.Point.Width * Model.Point.Scale) + 5+"px");
-            overflow: hidden;
-            margin-left: auto;
-            margin-right: auto;
-        }
+                var iwidth = $('#image').width();
+                var iheight = $('#image').height();
+                owidth = $('#outerImage').width();
+                koef = owidth / iwidth;
+                koef = Math.round(koef * 100) / 100;
 
-        .center {
-            margin-left: auto;
-            margin-right: auto;
-        }
-    </style>*@
 
+                $('#image').css('transform', 'scale(' + koef + ')');
+
+                newkwidth = iwidth * koef + 10;
+                $('#wrapImage').css("width", newkwidth);
+                newkheight = iheight * koef + 10;
+                $('#wrapImage').css("height", newkheight);
+
+            }
+
+            $(document).ready(function () {
+                Scale();
+            });
+
+            $(window).resize(function () {
+                Scale();
+            });
+        });
+
+
+    </script>
+}
 <div class="row">
     <h4 class="col-md-4">@ViewData["Title"]</h4>
     <h4 class="col-md-6"><a asp-action="Index">Мои объявления</a></h4>
@@ -42,12 +56,12 @@
 </div>
 <hr />
 
-<div class="row" style="border: 1px solid;">    
+<div class="row" style="border: 1px solid;">
     <div class="col-md-6" style="border: 1px dotted;">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="Id" />
 
-        <div class="form-group text-center">            
+        <div class="form-group text-center">
             <a asp-action="PaymentConfirmed" asp-route-id="@Model.Id">Зачисление оплаты</a> |
             <a asp-action="PaymentConfirmed" asp-route-id="@Model.Id" asp-route-wait="true">Зачисление оплаты и в очередь</a> |
         </div>
@@ -78,7 +92,7 @@
 
             <div class="form-group col-md-6">
                 <label asp-for="FontSize" class="control-label"></label>
-                <input asp-for="FontSize" class="form-control" disabled="disabled"/>
+                <input asp-for="FontSize" class="form-control" disabled="disabled" />
                 <span asp-validation-for="FontSize" class="text-danger"></span>
             </div>
 
@@ -99,8 +113,8 @@
     <div class="col-md-6">
         @if (Model.AdvertisementType == Dal.Models.AdvertisementType.Text)
         {
-            <div class="text-center text-info">Так будет выглядеть текст на экране</div>
-            <div class="wrap">
+            <div id="outerScreen" class="text-center text-info">Так будет выглядеть текст на экране</div>
+            <div class="wrap" id="wrapScreen">
                 <div class="PointScreen" style="font-size: @(Model.FontSize + "px");" id="screenEmulator">
                     @Html.Raw(Model.Text)
                 </div>
@@ -108,10 +122,9 @@
         }
         else if (Model.AdvertisementType == Dal.Models.AdvertisementType.Photo)
         {
-            <div class="text-center text-info">Так будет выглядеть изображение на экране</div>
-            <div class="wrap">
-                <img id="image" src=@Model.ImagePath
-                     class="PointImage" />
+            <div id="outerImage" class="text-center text-info">Так будет выглядеть изображение на экране</div>
+            <div class="wrap" id="wrapImage">
+                <img id="image" src=@Model.ImagePath class="PointImage" />
             </div>
         }
         else if (Model.AdvertisementType == Dal.Models.AdvertisementType.Video)
@@ -125,84 +138,4 @@
 
         }
     </div>
-</div>
-
-
-<!--<div>
-    <h4>@ViewData["Title"]</h4>
-    <h4 class="text-danger text-center">@TempData["Message"]</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Duration)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Duration)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DurationInDays)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DurationInDays)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.CreateDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.CreateDate)
-        </dd>
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.AdvertisementType)
-        </dt>
-        <dd class="col-sm-10">
-
-            @Html.DisplayFor(model => (model.AdvertisementType))
-
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Text)
-        </dt>
-        <dd class="col-sm-10">-->
-            @*@Html.DisplayFor(model => model.Text)*@
-            <!--@Html.Raw(Model.Text)
-        </dd>
-
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.AdNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.AdNumber)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Point)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Point.Name)
-        </dd>
-    </dl>
-</div>
-
-<div class="wrap">
-    <img id="image" src=@Model.ImagePath
-         class="PointImage" />
-</div>-->
-
-<div>
-    @*<a asp-action="Index">К списку объявлений</a> |*@
-    <a asp-action="PaymentConfirmed" asp-route-id="@Model.Id">Зачисление оплаты</a> |
-    <a asp-action="PaymentConfirmed" asp-route-id="@Model.Id" asp-route-wait="true">Зачисление оплаты и в очередь</a> |
 </div>

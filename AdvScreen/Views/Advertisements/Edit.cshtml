@@ -131,11 +131,11 @@
             }
 
             $(document).ready(function () {
-                Scale();
+                //Scale();
             });
 
             $(window).resize(function () {
-                Scale();
+                //Scale();
             });
         });
 
@@ -203,6 +203,10 @@
                     <input asp-for="Price" class="form-control" disabled="disabled" />
                     <span asp-validation-for="Price" class="text-danger"></span>
                 </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="AdvertisementStatus" class="control-label">Статус объявления</label>
+                    <input asp-for="AdvertisementStatus.NameRu" class="form-control" disabled="disabled" />
+                </div>
             </div>
             <div class="text-center text-info">Ваше объявление будет в эфире @Model.Duration секунд, в цикле, на протяжении @Model.DurationInDays  (дней/дня)</div>
             <div class="text-center text-info">Если других объявлений не будет в эфире, то ваше объявление будет отображаться постоянно</div>
@@ -212,9 +216,9 @@
             }
             else if (Model.AdvertisementStatus.Name == Dal.Models.AdvertisementStatusEnum.ForPayment.ToString())
             {
-                <div class="text-center text-danger">
+                <div class="text-center text-danger font-weight-bold">
                     Ваше объявление одобрено. Сделайте перевод на Kaspi номер 5169 4971 8400 9425 (Канат)!
-                    <br />После перевода отправьте пожалуйста чек оплаты на почту kenselerinfo@gmail.com а в письме укажите ссылку (ниже)
+                    <br />После перевода, отправьте пожалуйста, ЧЕК ОПЛАТЫ на почту kenselerinfo@gmail.com а в письме укажите ссылку (ниже)
                     <br />@Context.Request.Host@Context.Request.Path
                 </div>
             }

@@ -308,8 +308,35 @@
                     <input asp-for="Price" class="form-control" disabled="disabled" />
                     <span asp-validation-for="Price" class="text-danger"></span>
                 </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="AdvertisementStatus" class="control-label">Статус объявления</label>
+                    <input asp-for="AdvertisementStatus.NameRu" class="form-control" disabled="disabled" />                    
+                </div>
             </div>
+            <div class="text-danger border border-primary">
+                То что видит пользователь
+                <div class="text-center text-info">Ваше объявление будет в эфире @Model.Duration секунд, в цикле, на протяжении @Model.DurationInDays  (дней/дня)</div>
+                <div class="text-center text-info">Если других объявлений не будет в эфире, то ваше объявление будет отображаться постоянно</div>
+                @if (Model.AdvertisementStatus.Name == Dal.Models.AdvertisementStatusEnum.InModeration.ToString())
+                {
+                    <div class="text-center text-danger">Ваше объявление проверяется. Редактирование невозможно. Пожалуйста ожидайте!</div>
+                }
+                else if (Model.AdvertisementStatus.Name == Dal.Models.AdvertisementStatusEnum.ForPayment.ToString())
+                {
+                    <div class="text-center text-danger">
+                        Ваше объявление одобрено. Сделайте перевод на Kaspi номер 5169 4971 8400 9425 (Канат)!
+                        <br />После перевода отправьте пожалуйста чек оплаты на почту kenselerinfo@gmail.com а в письме укажите ссылку (ниже)
+                        <br />@Context.Request.Host@Context.Request.Path
+                    </div>
+                }
+                else if (Model.AdvertisementStatus.Name == Dal.Models.AdvertisementStatusEnum.Active.ToString())
+                {
+                    <div class="text-center text-danger">
+                        Ваше объявление в эфире c @Model.StartDate.ToString("dd.MM.yyyy HH:mm") - @Model.EndDate.ToString("dd.MM.yyyy HH:mm")
 
+                    </div>
+                }
+            </div>
             <div class="text-center">
                 <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Text) ? "checked" : "") value=@Dal.Models.AdvertisementType.Text name="AdvertisementType" autocomplete="off" id="radioText" /><label for="radioText">Текст</label>
                 <input class="form-check form-check-inline" type="radio" @((Model.AdvertisementType == AdvertisementType.Photo) ? "checked" : "") value=@Dal.Models.AdvertisementType.Photo name="AdvertisementType" autocomplete="off" id="radioPhoto" /><label for="radioPhoto">Изображение</label>
@@ -320,10 +347,10 @@
                 @if (Model.AdvertisementStatus.Name.Contains("Created") || Model.AdvertisementStatus.Name.Contains("Finished"))
                 {
                     @*<a asp-controller="Advertisements"
-                        asp-action="SendToModeration"
-                        asp-route-id=@Model.Id
-                        class="btn btn-primary"
-                        >Отправить на модерацию</a>*@
+                asp-action="SendToModeration"
+                asp-route-id=@Model.Id
+                class="btn btn-primary"
+                >Отправить на модерацию</a>*@
 
                     <button id="sendToModerate" class="btn btn-primary">
                         Отправить на модерацию
@@ -373,7 +400,7 @@
                         <input type="submit" value="Сохранить" class="btn btn-primary" @*onclick="return FormSubmit();"*@ />
                     </div>
                     <div class="col-md-6" id="outerScreen">
-                        <div class="text-center text-info">Так будет выглядеть текст на экране</div>                        
+                        <div class="text-center text-info">Так будет выглядеть текст на экране</div>
                         <div class="wrap" id="wrapScreen">
                             <div class="PointScreen" style="font-size: @(Model.FontSize+"px");" id="screenEmulator">
                                 @Html.Raw(Model.Text)

@@ -16,13 +16,7 @@
         <MediaElement Grid.Row="0" 
                           MediaOpened="MediaElement_MediaOpened" 
                           x:Name="MyMediaElement"
-                          MediaFailed="MediaElement_MediaFailed"
-                            
-                      
-                      
-                      
-                      
-                      
+                          MediaFailed="MediaElement_MediaFailed"                      
                           >
         </MediaElement>
         <ActivityIndicator Grid.Row="0" x:Name="MyActivityIndicator" 

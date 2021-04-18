@@ -23,7 +23,6 @@ namespace AdvScreen.Controllers
             return View();
         }
 
-
         public IActionResult Contact()
         {
             return View();
@@ -48,12 +47,16 @@ namespace AdvScreen.Controllers
             return File(fileBytes, contentType, fileName);
         }
 
+        public IActionResult Locations()
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-
         
         public IActionResult ErrorHandle()
         {
