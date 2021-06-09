@@ -187,6 +187,7 @@ namespace Starter
                             {
                                 //Navigation.PushAsync(new VideoPage(cycle.CurrentAdvertisement.Video));
                                 if (!string.IsNullOrEmpty(cycle.CurrentAdvertisement.Video))
+                                    //Navigation.PushAsync(new VideoPage(cycle.CurrentAdvertisement.Video));
                                 Navigation.PushAsync(new VideoPage2(cycle.CurrentAdvertisement.Video));
                                 //Navigation.PushAsync(new VideoPage3(cycle.CurrentAdvertisement.Video));
 

@@ -11,6 +11,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
+using Starter.Services;
 
 namespace Starter
 {
@@ -18,10 +19,11 @@ namespace Starter
     public partial class VideoPage2 : ContentPage
     {
         //private string youtubeLink;
-        
+        private readonly YouTubeService _youTubeService;
+
         public VideoPage2(string youtubeLink)
         {            
-            InitializeComponent();           
+            InitializeComponent();
             
             try
             {
@@ -120,6 +122,7 @@ namespace Starter
             //    return stream["url"];
             //}
         }
+        
 
         public void MediaElement_MediaOpened(System.Object sender, System.EventArgs e)
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Starter.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -17,66 +18,69 @@ namespace Starter
     public partial class VideoPage : ContentPage
     {
         //private string youtubeLink;
-        
+        private readonly YouTubeService _youTubeService;
         public VideoPage(string youtubeLink)
         {            
             InitializeComponent();
+            _youTubeService = new YouTubeService();
             try
             {
-                GetVideoContent(youtubeLink);
+                //GetVideoContent(youtubeLink);
+                LoadVideo(youtubeLink);
             }
             catch (Exception ex)
             {
                 Navigation.PopToRootAsync();
-            }            
+            }
+            finally
+            {
+                MyActivityIndicator.IsRunning = false;
+            }
+        }
+
+
+        public async void LoadVideo(string videoUrl)
+        {
+            MyActivityIndicator.IsRunning = true;
+            var video = await _youTubeService.GetVideoFromUrlAsync(videoUrl);
+            Title = video.Title;
+            MyMediaElement.Source = video.VideoStreamUrl;
         }
 
         //public void SetYoutubeLink(string youtubeLink)
         //{
         //    this.youtubeLink = youtubeLink;
         //}
-        
+
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
             MyMediaElement.Stop();
         }
 
-        private async Task GetVideoContent(string youtubeLink)
-        {
-            MyActivityIndicator.IsVisible = true;
-            var youtube = new YoutubeClient();
-            
-            // You can specify video ID or URL
-            //https://www.youtube.com/watch?v=T04628YySJQ
-            //https://www.youtube.com/watch?v=DjfEBnPb4ns&t=15s
-            var video = await youtube.Videos.GetAsync(youtubeLink);
+        //private async Task GetVideoContent(string youtubeLink)
+        //{
+        //    MyActivityIndicator.IsVisible = true;
+        //    var youtube = new YoutubeClient();            
 
-            var title = video.Title; // "Downloaded Video Title"
-            var author = video.Author; // "Downloaded Video Author"
-            var duration = video.Duration; // "Downloaded Video Duration Count"
+        //    try
+        //    {
+        //        var streamManifest = await youtube.Videos.Streams.GetManifestAsync(youtubeLink);
+        //        //var streamInfo = streamManifest.GetVideoOnly().Where(v=>v.VideoQuality == streamManifest.GetVideoOnly().GetAllVideoQualities().Min()).WithHighestVideoQuality();                
+        //        var streamInfo = streamManifest.GetMuxed().WithHighestVideoQuality();
 
-            //Now it's time to get stream :
-
-            try
-            {
-                var streamManifest = await youtube.Videos.Streams.GetManifestAsync(youtubeLink);
-                //var streamInfo = streamManifest.GetVideoOnly().Where(v=>v.VideoQuality == streamManifest.GetVideoOnly().GetAllVideoQualities().Min()).WithHighestVideoQuality();                
-                var streamInfo = streamManifest.GetMuxed().WithHighestVideoQuality();
-
-                if (streamInfo != null)
-                {
-                    // Get the actual stream
-                    var stream = await youtube.Videos.Streams.GetAsync(streamInfo);
-                    MyMediaElement.Source = streamInfo.Url;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-        }
+        //        if (streamInfo != null)
+        //        {
+        //            // Get the actual stream
+        //            //var stream = await youtube.Videos.Streams.GetAsync(streamInfo);
+        //            MyMediaElement.Source = streamInfo.Url;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex);
+        //    }
+        //}
 
 
 
