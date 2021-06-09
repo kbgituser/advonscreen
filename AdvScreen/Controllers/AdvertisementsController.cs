@@ -132,7 +132,7 @@ namespace AdvScreen.Controllers
                     advertisements = advertisements.OrderBy(s => s.CreateDate);
                     break;
                 default:
-                    advertisements = advertisements.OrderBy(s => s.AdNumber);
+                    advertisements = advertisements.OrderByDescending(s => s.CreateDate);
                     break;
             }
 
@@ -488,7 +488,9 @@ namespace AdvScreen.Controllers
                     var curAdv = _context.Advertisements.FirstOrDefault(a => a.Id == id);
 
                     ApplicationUser CurrentUser = GetCurrentUser();
-                    if (!await _userManager.IsInRoleAsync(CurrentUser, "Admin")
+                    if (!(await _userManager.IsInRoleAsync(CurrentUser, "Admin") 
+                            || await _userManager.IsInRoleAsync(CurrentUser, "Moderator")
+                         )
                         && !(curAdv.AdvertisementStatus.Name == AdvertisementStatusEnum.Created.ToString()
                         || curAdv.AdvertisementStatus.Name == AdvertisementStatusEnum.Finished.ToString()
                         )
@@ -508,13 +510,14 @@ namespace AdvScreen.Controllers
                     curAdv.AdNumber = GenerateAdvertisementNumber(curAdv);
                     curAdv.BackgroundColor = advertisement.BackgroundColor;
                     curAdv.AdvertisementType = advertisement.AdvertisementType;
-                    if (await _userManager.IsInRoleAsync(CurrentUser, "Admin"))
-                        {
+                    if (await _userManager.IsInRoleAsync(CurrentUser, "Admin") 
+                        || await  _userManager.IsInRoleAsync(CurrentUser, "Moderator")
+                        )
+                    {
                         curAdv.Video = advertisement.Video;
                     }
                     
                     _context.Update(curAdv);
-
 
                     if (uploadedFile != null)
                     {
@@ -550,7 +553,6 @@ namespace AdvScreen.Controllers
                     }
 
                     await _context.SaveChangesAsync();
-
                 }
                 catch (DbUpdateConcurrencyException)
                 {
